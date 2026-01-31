@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nachhaltiges Handeln - Lernapp</title>
+    <style>
+        :root {
+            --color-primary: #2D5A3D;
+            --color-secondary: #7A9E7E;
+            --color-accent: #C8B896;
+            --color-bg: #F5F5F0;
+            --color-surface: #FFFFFF;
+            --color-text: #2C3E2C;
+            --color-text-light: #5A6B5A;
+            --color-border: #D4D9D4;
+            --color-hover: #3D6A4D;
+            --space-xs: 0.5rem;
+            --space-sm: 1rem;
+            --space-md: 1.5rem;
+            --space-lg: 2rem;
+            --space-xl: 3rem;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-lg);
+        }
+
+        header {
+            background: var(--color-primary);
+            color: white;
+            padding: var(--space-lg) 0;
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: var(--space-xs);
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .lang-switch {
+            position: absolute;
+            top: var(--space-lg);
+            right: var(--space-lg);
+            display: flex;
+            gap: var(--space-xs);
+            background: rgba(255,255,255,0.15);
+            padding: var(--space-xs);
+            border-radius: var(--radius-md);
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .lang-btn.active {
+            background: white;
+            color: var(--color-primary);
+            border-color: white;
+        }
+
+        .lang-btn:hover:not(.active) {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .nav-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+            padding: var(--space-sm);
+            background: var(--color-surface);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .breadcrumb-item {
+            color: var(--color-text-light);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb-separator {
+            color: var(--color-border);
+        }
+
+        .breadcrumb-current {
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        .back-btn {
+            background: var(--color-secondary);
+            color: white;
+            border: none;
+            padding: var(--space-xs) var(--space-md);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .back-btn:hover {
+            background: var(--color-hover);
+        }
+
+        .cluster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .cluster-card {
+            background: var(--color-surface);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .cluster-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--color-primary);
+        }
+        
+        .cluster-card:active {
+            transform: translateY(-2px);
+        }
+
+        .cluster-card h2 {
+            font-size: 1.5rem;
+            color: var(--color-primary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .cluster-card .concept-count {
+            color: var(--color-text-light);
+            font-size: 0.875rem;
+        }
+
+        .concept-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .concept-item {
+            background: var(--color-surface);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .concept-item:hover {
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .concept-item:active {
+            transform: scale(0.98);
+        }
+
+        .concept-item h3 {
+            color: var(--color-primary);
+            font-size: 1.25rem;
+            margin-bottom: var(--space-xs);
+        }
+
+        .card-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-md);
+        }
+
+        .card-type-btn {
+            background: var(--color-surface);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: left;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .card-type-btn:hover {
+            border-color: var(--color-primary);
+            background: var(--color-primary);
+            color: white;
+        }
+        
+        .card-type-btn:active {
+            transform: scale(0.98);
+        }
+
+        .card-type-btn h4 {
+            font-size: 1.125rem;
+            margin-bottom: var(--space-xs);
+        }
+
+        .card-type-btn p {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .card-viewer {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .card-header {
+            border-bottom: 2px solid var(--color-border);
+            padding-bottom: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .card-title {
+            font-size: 1.75rem;
+            color: var(--color-primary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .card-content {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: var(--color-text);
+        }
+
+        .definition-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        .definition-item {
+            background: var(--color-bg);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .definition-term {
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: var(--color-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .definition-text {
+            color: var(--color-text);
+        }
+
+        .question-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .question-item {
+            background: var(--color-bg);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            border-left: 4px solid var(--color-secondary);
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        .task-item {
+            background: var(--color-bg);
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            border: 2px solid var(--color-border);
+        }
+
+        .task-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: var(--color-primary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .task-prompt {
+            color: var(--color-text);
+            white-space: pre-wrap;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .card-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: var(--space-lg);
+            padding-top: var(--space-lg);
+            border-top: 2px solid var(--color-border);
+        }
+
+        .nav-btn {
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: var(--color-hover);
+        }
+
+        .nav-btn:disabled {
+            background: var(--color-border);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--space-md);
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .cluster-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-type-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .lang-switch {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-top: var(--space-md);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1 id="mainTitle">Nachhaltiges Handeln in Wirtschaft und Gesellschaft</h1>
+            <p class="subtitle" id="mainSubtitle">Interaktive Lernapp zur Vertiefung der Buchinhalte</p>
+            <div class="lang-switch">
+                <button class="lang-btn active" data-lang="de">DE</button>
+                <button class="lang-btn" data-lang="en">EN</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="breadcrumb" class="nav-breadcrumb hidden"></div>
+
+        <div id="clusterView" class="cluster-grid"></div>
+        <div id="conceptView" class="hidden"></div>
+        <div id="cardTypeView" class="hidden"></div>
+        <div id="cardContentView" class="hidden"></div>
+    </div>
+
+    <script>
+        const appData = {
+            "app_settings": {
+                "purpose": "Vertiefung der Inhalte des Buches 'Nachhaltiges Handeln in Wirtschaft und Gesellschaft' nach der Lektüre. Nutzer:innen sollen die Konzepte verstehen, ins eigene Nachdenken integrieren, für eigene Fragestellungen nutzen und kreativ damit arbeiten.",
+                "target_groups": [
+                    "Studierende, die das Buch im Rahmen ihrer universitären Ausbildung kennenlernen",
+                    "Praktiker:innen in Verwaltung, Unternehmen und Zivilgesellschaft, die das Buch aus Interesse lesen"
+                ],
+                "languages": ["de", "en"],
+                "navigation": {
+                    "clusters": ["Natur", "Zeit", "Menschheit"]
+                }
+            },
+            "concepts": [
+                {
+                    "id": "nachhaltigkeit_gerechtigkeit",
+                    "cluster": "Menschheit",
+                    "concept_title_de": "Nachhaltigkeit und Gerechtigkeit",
+                    "concept_title_en": "Sustainability and Justice",
+                    "cards": {
+                        "worum_gehts": {
+                            "text_de": "Das Konzept verknüpft nachhaltige Entwicklung mit Gerechtigkeit und diskutiert Wachstumskritik und Suffizienz.",
+                            "text_en": "The concept links sustainable development with justice and discusses growth criticism and sufficiency."
+                        },
+                        "kerndefinitionen": [
+                            {
+                                "term_de": "Nachhaltige Entwicklung",
+                                "definition_de": "Entwicklung, die heutige Bedürfnisse erfüllt, ohne künftige Generationen in ihren Möglichkeiten zu beschneiden.",
+                                "term_en": "Sustainable Development",
+                                "definition_en": "Development that meets present needs without compromising future generations' possibilities."
+                            },
+                            {
+                                "term_de": "Verteilungsgerechtigkeit",
+                                "definition_de": "Zuteilung von Gütern, Chancen oder Pflichten so, dass jede Person erhält, was ihr zusteht.",
+                                "term_en": "Distributive Justice",
+                                "definition_en": "Allocation of goods, opportunities, or duties ensuring each person receives what they are entitled to."
+                            },
+                            {
+                                "term_de": "Ordnungsgerechtigkeit",
+                                "definition_de": "Rahmen von Freiheit, Frieden, Stabilität und Partizipation, der eine gerechte Ordnung trägt.",
+                                "term_en": "Procedural Justice",
+                                "definition_en": "Framework of freedom, peace, stability, and participation supporting a just order."
+                            },
+                            {
+                                "term_de": "Intragenerationale Gerechtigkeit",
+                                "definition_de": "Gerechtigkeit zwischen heute lebenden Menschen und Gruppen innerhalb einer Generation.",
+                                "term_en": "Intragenerational Justice",
+                                "definition_en": "Justice among people and groups living today within one generation."
+                            },
+                            {
+                                "term_de": "Intergenerationale Gerechtigkeit",
+                                "definition_de": "Gerechter Umgang heutiger Generationen mit den Lebensmöglichkeiten der künftigen.",
+                                "term_en": "Intergenerational Justice",
+                                "definition_en": "Fair treatment by current generations of future generations' life possibilities."
+                            },
+                            {
+                                "term_de": "Suffizienz",
+                                "definition_de": "Ausrichtung von Konsum und Produktion auf ein angemessenes Maß für ein gutes Leben.",
+                                "term_en": "Sufficiency",
+                                "definition_en": "Orienting consumption and production toward an appropriate measure for good life."
+                            }
+                        ],
+                        "reflexionsaufgaben": [
+                            {
+                                "question_de": "Wo siehst du in deiner Praxis Spannungen zwischen intra‑ und intergenerationaler Gerechtigkeit, und wie würdest du sie mit dem „Korridor der Bedürfnisse" fassen?",
+                                "question_en": "Where do you see tensions in your practice between intra- and intergenerational justice, and how would you frame them using the 'corridor of needs'?"
+                            },
+                            {
+                                "question_de": "Welche deiner eigenen Konsummuster wären im Sinne des Suffizienzbegriffs zu hoch, welche zu niedrig?",
+                                "question_en": "Which of your own consumption patterns would be too high or too low in terms of sufficiency?"
+                            },
+                            {
+                                "question_de": "Wie würdest du die 17 SDGs mit dem im Kapitel entwickelten Gerechtigkeitsbegriff ins Verhältnis setzen?",
+                                "question_en": "How would you relate the 17 SDGs to the concept of justice developed in this chapter?"
+                            }
+                        ],
+                        "uebungsaufgaben_verstehen": [
+                            {
+                                "title_de": "Aufgabe 1: Grundlagen Nachhaltigkeit und Gerechtigkeit",
+                                "prompt_de": "a) Warum ist Nachdenken über Gerechtigkeit nötig, um nachhaltige Entwicklung zu bestimmen?\n\nb) Konstruieren Sie ein Beispiel, das zeigt, dass Verteilungsgerechtigkeit allein kein gutes Leben für alle garantiert.\n\nc) Erläutern Sie anhand eines Beispiels intra- und intergenerationale Gerechtigkeit.\n\nd) Analysieren Sie das Flugticket-Szenario im Hinblick auf intra- und intergenerationale Gerechtigkeit.\n\ne) Erklären Sie mit einem Beispiel, warum eine Gesellschaft bestimmte Bedürfnisse einschränken darf.",
+                                "title_en": "Task 1: Foundations of Sustainability and Justice",
+                                "prompt_en": "a) Why is reflection on justice necessary to define sustainable development?\n\nb) Construct an example showing that distributive justice alone does not guarantee good life for all.\n\nc) Explain intra- and intergenerational justice using an example.\n\nd) Analyze the flight ticket scenario regarding intra- and intergenerational justice.\n\ne) Explain with an example why a society may restrict certain needs."
+                            }
+                        ],
+                        "uebungsaufgaben_kreativ": [
+                            {
+                                "title_de": "Kreativaufgabe: Gedankenexperimente zu Nachhaltigkeit",
+                                "prompt_de": "a) Angenommen, Planet und Ressourcen wären unbegrenzt: Könnte wirtschaftliche Entwicklung dennoch nicht nachhaltig sein?\n\nb) Übertragen Sie einen vollständigen fossilen Ausstieg ab 2030 in die Metapher des Kuchenbackens.",
+                                "title_en": "Creative Task: Thought Experiments on Sustainability",
+                                "prompt_en": "a) Assuming the planet and resources were unlimited: Could economic development still be unsustainable?\n\nb) Translate a complete fossil fuel phase-out from 2030 into the metaphor of baking a cake."
+                            }
+                        ],
+                        "uebungsaufgaben_weiterfuehrend": [
+                            {
+                                "title_de": "Aufgabe 2: Szenarienbewertung",
+                                "prompt_de": "Diskutieren Sie für die beiden Szenarien Kohlekraftwerk im Entwicklungsland und AKW‑Laufzeitverlängerung, inwiefern die Handlungen intra- und intergenerational nachhaltig sind.",
+                                "title_en": "Task 2: Scenario Evaluation",
+                                "prompt_en": "Discuss for both scenarios (coal plant in developing country and nuclear plant extension) to what extent actions are intra- and intergenerationally sustainable."
+                            },
+                            {
+                                "title_de": "Aufgabe 3: Allgemeine Gerechtigkeit und Verzicht",
+                                "prompt_de": "Analysieren Sie das Gespräch zwischen Maren und Betül. Begründen Sie Betüls Aussage mit Bezug auf die allgemeine Gerechtigkeit.",
+                                "title_en": "Task 3: General Justice and Renunciation",
+                                "prompt_en": "Analyze the conversation between Maren and Betül. Justify Betül's statement with reference to general justice."
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "menschenbilder_homo",
+                    "cluster": "Menschheit",
+                    "concept_title_de": "Menschenbilder: Homo Oeconomicus und Homo Politicus",
+                    "concept_title_en": "Human Images: Homo Oeconomicus and Homo Politicus",
+                    "cards": {
+                        "worum_gehts": {
+                            "text_de": "Das Konzept kontrastiert Homo oeconomicus und Homo politicus und fragt nach ihren Rollen für nachhaltiges Handeln.",
+                            "text_en": "The concept contrasts Homo oeconomicus and Homo politicus, examining their roles for sustainable action."
+                        },
+                        "kerndefinitionen": [
+                            {
+                                "term_de": "Homo oeconomicus",
+                                "definition_de": "Analytisches Menschenbild des rationalen, nutzenmaximierenden, eigeninteressierten und nie gesättigten Akteurs.",
+                                "term_en": "Homo oeconomicus",
+                                "definition_en": "Analytical human image of the rational, utility-maximizing, self-interested, never satisfied actor."
+                            },
+                            {
+                                "term_de": "Homo politicus",
+                                "definition_de": "Menschenbild eines Akteurs mit Gerechtigkeitssinn, Mut, Urteilskraft und Verantwortungsbewusstsein im Gemeinwesen.",
+                                "term_en": "Homo politicus",
+                                "definition_en": "Human image of an actor with sense of justice, courage, judgment, and responsibility in the community."
+                            },
+                            {
+                                "term_de": "Konsumentensouveränität",
+                                "definition_de": "Annahme, dass Individuen ihre Bedürfnisse am besten kennen und frei über Konsum entscheiden.",
+                                "term_en": "Consumer Sovereignty",
+                                "definition_en": "Assumption that individuals know their needs best and decide freely about consumption."
+                            },
+                            {
+                                "term_de": "Ziviler Widerstand",
+                                "definition_de": "Bewusster Rechtsbruch im Namen höherer Gerechtigkeit, der auf gesellschaftlichen Wandel zielt.",
+                                "term_en": "Civil Resistance",
+                                "definition_en": "Conscious breach of law in the name of higher justice, aiming for social change."
+                            }
+                        ],
+                        "reflexionsaufgaben": [
+                            {
+                                "question_de": "In welchen Rollen handelst du eher als Homo oeconomicus, in welchen eher als Homo politicus, und wo entstehen Spannungen?",
+                                "question_en": "In which roles do you act more as Homo oeconomicus, in which as Homo politicus, and where do tensions arise?"
+                            },
+                            {
+                                "question_de": "Welche Kriterien würdest du an aktuelle Klimaproteste anlegen, um ihren Anspruch auf zivilen Widerstand zu prüfen?",
+                                "question_en": "What criteria would you apply to current climate protests to examine their claim to civil resistance?"
+                            },
+                            {
+                                "question_de": "Was bedeutet es für dich, Macht im Sinne des Homo politicus rechtlich gebunden und verantwortungsvoll auszuüben?",
+                                "question_en": "What does it mean to you to exercise power in the sense of Homo politicus, legally bound and responsibly?"
+                            }
+                        ],
+                        "uebungsaufgaben_verstehen": [
+                            {
+                                "title_de": "Aufgabe 1: Homo oeconomicus",
+                                "prompt_de": "a) Welche Annahme zum Homo oeconomicus halten Sie für kritisch und warum?\n\nb) Verteidigen Sie den Homo oeconomicus gegenüber typischer Kritik.\n\nc) Entwerfen Sie auf dieser Basis eine Abwasserregelung.\n\nd) Erklären Sie, warum sein Verhalten berechenbar ist.",
+                                "title_en": "Task 1: Homo oeconomicus",
+                                "prompt_en": "a) Which assumption about Homo oeconomicus do you find critical and why?\n\nb) Defend Homo oeconomicus against typical criticism.\n\nc) Design a wastewater regulation on this basis.\n\nd) Explain why their behavior is predictable."
+                            },
+                            {
+                                "title_de": "Aufgabe 2: Homo politicus",
+                                "prompt_de": "a) Welche Annahme zum Homo politicus halten Sie für kritisch und warum?\n\nb) Verteidigen Sie den Homo politicus gegenüber Kritik.\n\nc) Entwerfen Sie eine Abwasserregelung auf dieser Grundlage.\n\nd) Erklären Sie, warum sein Handeln nicht vorhersehbar ist.",
+                                "title_en": "Task 2: Homo politicus",
+                                "prompt_en": "a) Which assumption about Homo politicus do you find critical and why?\n\nb) Defend Homo politicus against criticism.\n\nc) Design a wastewater regulation on this basis.\n\nd) Explain why their action is unpredictable."
+                            }
+                        ],
+                        "uebungsaufgaben_kreativ": [
+                            {
+                                "title_de": "Aufgabe 3: Kritik der Wasserabgabe",
+                                "prompt_de": "Kritisieren Sie eine Wasserabgabe auf verschmutztes Wasser\n\na) aus Sicht des Homo oeconomicus,\n\nb) aus Sicht des Homo politicus.",
+                                "title_en": "Task 3: Critique of Water Charge",
+                                "prompt_en": "Criticize a water charge on polluted water\n\na) from the perspective of Homo oeconomicus,\n\nb) from the perspective of Homo politicus."
+                            }
+                        ],
+                        "uebungsaufgaben_weiterfuehrend": [
+                            {
+                                "title_de": "Aufgabe 4: Menschenbild im Gaspreisdeckel",
+                                "prompt_de": "Analysieren Sie den vorgeschlagenen Gaspreisdeckel: Welches Menschenbild liegt zugrunde und ist es für das Problem angemessen?",
+                                "title_en": "Task 4: Human Image in Gas Price Cap",
+                                "prompt_en": "Analyze the proposed gas price cap: What human image underlies it and is it appropriate for the problem?"
+                            },
+                            {
+                                "title_de": "Aufgabe 5: Klimabewegungen als Homines politici",
+                                "prompt_de": "Inwiefern können die beschriebenen Klimabewegungen als Homines politici verstanden werden? Trifft dies auf alle genannten Bewegungen zu?",
+                                "title_en": "Task 5: Climate Movements as Homines politici",
+                                "prompt_en": "To what extent can the described climate movements be understood as Homines politici? Does this apply to all mentioned movements?"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "verantwortung",
+                    "cluster": "Menschheit",
+                    "concept_title_de": "Verantwortung",
+                    "concept_title_en": "Responsibility",
+                    "cards": {
+                        "worum_gehts": {
+                            "text_de": "Verantwortung wird als kausal, moralisch, rechtlich und politisch gefasst und auf Umweltprobleme angewendet.",
+                            "text_en": "Responsibility is conceived as causal, moral, legal, and political, and applied to environmental problems."
+                        },
+                        "kerndefinitionen": [
+                            {
+                                "term_de": "Kausale Verantwortung",
+                                "definition_de": "Zuschreibung, wer durch sein Handeln welche Folgen verursacht hat, zunächst ohne Bewertung.",
+                                "term_en": "Causal Responsibility",
+                                "definition_en": "Attribution of who caused which consequences through their actions, initially without evaluation."
+                            },
+                            {
+                                "term_de": "Moralische Verantwortung",
+                                "definition_de": "Bewertung von Handlungen anhand moralischer Maßstäbe und Erwartungen.",
+                                "term_en": "Moral Responsibility",
+                                "definition_en": "Evaluation of actions according to moral standards and expectations."
+                            },
+                            {
+                                "term_de": "Rechtliche Verantwortung",
+                                "definition_de": "Zurechnung von Handlungen nach geltendem Recht mit möglichen Sanktionen.",
+                                "term_en": "Legal Responsibility",
+                                "definition_en": "Attribution of actions according to applicable law with possible sanctions."
+                            },
+                            {
+                                "term_de": "Politische Verantwortung",
+                                "definition_de": "Pflicht von Akteuren in Positionen, für kollektive Probleme zu handeln.",
+                                "term_en": "Political Responsibility",
+                                "definition_en": "Duty of actors in positions to act on collective problems."
+                            }
+                        ],
+                        "reflexionsaufgaben": [
+                            {
+                                "question_de": "Wo würdest du im Emscher‑Beispiel deine eigene Rolle verorten, wenn du in verschiedenen Sektoren tätig wärst?",
+                                "question_en": "Where would you locate your own role in the Emscher example if you worked in different sectors?"
+                            },
+                            {
+                                "question_de": "Welche Umweltprobleme, mit denen du arbeitest, verlangen eher moralisch/rechtliche, welche eher politische Verantwortung?",
+                                "question_en": "Which environmental problems you work with require more moral/legal, which more political responsibility?"
+                            },
+                            {
+                                "question_de": "Wo erlebst du Unwissen als reale Grenze deiner Verantwortung und wie gehst du damit um?",
+                                "question_en": "Where do you experience ignorance as a real limit to your responsibility and how do you deal with it?"
+                            }
+                        ],
+                        "uebungsaufgaben_verstehen": [
+                            {
+                                "title_de": "Aufgabe 1: Zuschreibung von Verantwortung",
+                                "prompt_de": "Ordnen Sie die Beispiele der Verantwortung als Zuschreibung zu oder nicht und begründen Sie Ihre Einordnung.",
+                                "title_en": "Task 1: Attribution of Responsibility",
+                                "prompt_en": "Classify the examples as responsibility attribution or not and justify your classification."
+                            },
+                            {
+                                "title_de": "Aufgabe 2: Formen von Verantwortung",
+                                "prompt_de": "Ordnen Sie die Beispiele moralischer, rechtlicher und politischer Verantwortung zu und begründen Sie Ihre Zuordnung.",
+                                "title_en": "Task 2: Forms of Responsibility",
+                                "prompt_en": "Classify the examples as moral, legal, and political responsibility and justify your classification."
+                            }
+                        ],
+                        "uebungsaufgaben_kreativ": [
+                            {
+                                "title_de": "Kreativaufgabe: Kausale Verantwortung ohne Schuld",
+                                "prompt_de": "Konstruieren Sie einen Fall, in dem jemand kausal verantwortlich ist, ohne moralisch oder rechtlich schuldig zu sein.",
+                                "title_en": "Creative Task: Causal Responsibility Without Guilt",
+                                "prompt_en": "Construct a case where someone is causally responsible without being morally or legally guilty."
+                            }
+                        ],
+                        "uebungsaufgaben_weiterfuehrend": [
+                            {
+                                "title_de": "Aufgabe 3: Kommunales Abfallmanagement",
+                                "prompt_de": "Wer trägt an welcher Stelle Verantwortung für ein umweltgerechtes kommunales Abfallmanagement? Nennen Sie Akteure und Zuständigkeiten.",
+                                "title_en": "Task 3: Municipal Waste Management",
+                                "prompt_en": "Who bears responsibility at which point for environmentally sound municipal waste management? Name actors and responsibilities."
+                            },
+                            {
+                                "title_de": "Aufgabe 4: Grenzen individueller Verantwortung",
+                                "prompt_de": "Erläutern Sie an einem Beispiel, inwiefern Wissen die Grenze individueller Verantwortung markiert.",
+                                "title_en": "Task 4: Limits of Individual Responsibility",
+                                "prompt_en": "Explain with an example how knowledge marks the limit of individual responsibility."
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "urteilskraft",
+                    "cluster": "Menschheit",
+                    "concept_title_de": "Urteilskraft",
+                    "concept_title_en": "Judgement",
+                    "cards": {
+                        "worum_gehts": {
+                            "text_de": "Urteilskraft verbindet Wissen und Handeln, um trotz Unwissen und Komplexität angemessen zu entscheiden.",
+                            "text_en": "Judgement connects knowledge and action to decide appropriately despite ignorance and complexity."
+                        },
+                        "kerndefinitionen": [
+                            {
+                                "term_de": "Urteilskraft",
+                                "definition_de": "Fähigkeit, Regeln und Wissen auf konkrete Fälle anzuwenden und situationsgerecht zu handeln.",
+                                "term_en": "Judgement",
+                                "definition_en": "Ability to apply rules and knowledge to specific cases and act appropriately to situations."
+                            },
+                            {
+                                "term_de": "Know-that",
+                                "definition_de": "Theoretisches Wissen über Sachverhalte, Modelle und Zusammenhänge.",
+                                "term_en": "Know-that",
+                                "definition_en": "Theoretical knowledge about facts, models, and relationships."
+                            },
+                            {
+                                "term_de": "Know-how",
+                                "definition_de": "Praktisches Können, das zeigt, wie man Wissen in Handlungen übersetzt.",
+                                "term_en": "Know-how",
+                                "definition_en": "Practical ability showing how to translate knowledge into actions."
+                            },
+                            {
+                                "term_de": "Kairos",
+                                "definition_de": "Günstiger Zeitpunkt für eine Entscheidung oder einen Eingriff.",
+                                "term_en": "Kairos",
+                                "definition_en": "Opportune moment for a decision or intervention."
+                            }
+                        ],
+                        "reflexionsaufgaben": [
+                            {
+                                "question_de": "Wo in deinem Arbeitsfeld erlebst du ein Übergewicht an Know‑that gegenüber fehlendem Know‑how?",
+                                "question_en": "Where in your field do you experience an excess of know-that versus lacking know-how?"
+                            },
+                            {
+                                "question_de": "Erinnere dich an eine Entscheidung unter Unsicherheit: Welche Regeln der Urteilskraft waren vorhanden, welche fehlten?",
+                                "question_en": "Recall a decision under uncertainty: Which rules of judgement were present, which were missing?"
+                            },
+                            {
+                                "question_de": "Wie würdest du ein Format nach Vorbild des Bürgerrats Klima gestalten, um Urteilskraft der Zivilgesellschaft zu stärken?",
+                                "question_en": "How would you design a format modeled on the Citizens' Climate Assembly to strengthen civil society's judgement?"
+                            }
+                        ],
+                        "uebungsaufgaben_verstehen": [],
+                        "uebungsaufgaben_kreativ": [],
+                        "uebungsaufgaben_weiterfuehrend": []
+                    }
+                },
+                {
+                    "id": "zeit",
+                    "cluster": "Zeit",
+                    "concept_title_de": "Zeitbegriffe: Chronos, inhärente Zeit, Kairos",
+                    "concept_title_en": "Time Concepts: Chronos, Inherent Time, Kairos",
+                    "cards": {
+                        "worum_gehts": {
+                            "text_de": "Das Konzept unterscheidet Chronos, inhärente Zeiten und Kairos und zeigt ihre Bedeutung für Umweltpolitik.",
+                            "text_en": "The concept distinguishes Chronos, inherent times, and Kairos, showing their significance for environmental policy."
+                        },
+                        "kerndefinitionen": [
+                            {
+                                "term_de": "Chronos",
+                                "definition_de": "Lineare, homogene Zeit, wie sie in Uhren und Zeitreihen gemessen wird.",
+                                "term_en": "Chronos",
+                                "definition_en": "Linear, homogeneous time as measured by clocks and time series."
+                            },
+                            {
+                                "term_de": "Inhärente Zeit",
+                                "definition_de": "Eigenzeit eines Prozesses, die sich aus seinen inneren Eigenschaften ergibt.",
+                                "term_en": "Inherent Time",
+                                "definition_en": "Proper time of a process emerging from its internal properties."
+                            },
+                            {
+                                "term_de": "Kairos",
+                                "definition_de": "Qualitativ günstiger Zeitpunkt oder Zeitfenster für eine Handlung.",
+                                "term_en": "Kairos",
+                                "definition_en": "Qualitatively favorable moment or time window for action."
+                            }
+                        ],
+                        "reflexionsaufgaben": [
+                            {
+                                "question_de": "Welche inhärenten Zeiten prägen die Transformationsprozesse, an denen du arbeitest?",
+                                "question_en": "Which inherent times shape the transformation processes you work on?"
+                            },
+                            {
+                                "question_de": "Nenne ein Beispiel, in dem du rückblickend einen Kairos verpasst oder genutzt hast.",
+                                "question_en": "Name an example where you retrospectively missed or used a Kairos."
+                            },
+                            {
+                                "question_de": "Wie planst du dein Projekt so, dass Eigenzeiten weder unterschätzt noch auf „später" verschoben werden?",
+                                "question_en": "How do you plan your project so that inherent times are neither underestimated nor postponed to 'later'?"
+                            }
+                        ],
+                        "uebungsaufgaben_verstehen": [
+                            {
+                                "title_de": "Aufgabe 1: Zeitdimensionen erkennen",
+                                "prompt_de": "Ordnen Sie den Beispielen die passenden Zeitdimensionen Chronos, inhärente Zeit und Kairos zu und begründen Sie Ihre Wahl.",
+                                "title_en": "Task 1: Recognizing Time Dimensions",
+                                "prompt_en": "Assign the appropriate time dimensions Chronos, inherent time, and Kairos to the examples and justify your choice."
+                            }
+                        ],
+                        "uebungsaufgaben_kreativ": [],
+                        "uebungsaufgaben_weiterfuehrend": [
+                            {
+                                "title_de": "Aufgabe 2: Geschichte der Kernkraft",
+                                "prompt_de": "Recherchieren Sie zur Kernkraftnutzung in Deutschland: a) Chronologie, b) inhärente Zeiten, c) mögliche Kairoi für den Ausstieg.",
+                                "title_en": "Task 2: History of Nuclear Power",
+                                "prompt_en": "Research nuclear power use in Germany: a) chronology, b) inherent times, c) possible Kairoi for phase-out."
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "thermodynamik",
+                    "cluster": "Natur",
+                    "concept_title_de": "Thermodynamik",
+                    "concept_title_en": "Thermodynamics",
+                    "cards": {
+                        "worum_gehts": {
+                            "text_de": "Thermodynamik erklärt Energieformen, Entropie und Wirkungsgrade als Grundlage von Umweltproblemen.",
+                            "text_en": "Thermodynamics explains energy forms, entropy, and efficiencies as the basis of environmental problems."
+                        },
+                        "kerndefinitionen": [
+                            {
+                                "term_de": "Erster Hauptsatz",
+                                "definition_de": "In einem isolierten System bleibt die Gesamtenergie und Masse konstant.",
+                                "term_en": "First Law",
+                                "definition_en": "In an isolated system, total energy and mass remain constant."
+                            },
+                            {
+                                "term_de": "Zweiter Hauptsatz",
+                                "definition_de": "Entropie in einem isolierten System kann nicht abnehmen, Prozesse sind gerichtet.",
+                                "term_en": "Second Law",
+                                "definition_en": "Entropy in an isolated system cannot decrease, processes are directional."
+                            },
+                            {
+                                "term_de": "Entropie",
+                                "definition_de": "Maß für Unordnung und qualitative Entwertung von Energie und Stoffen.",
+                                "term_en": "Entropy",
+                                "definition_en": "Measure of disorder and qualitative degradation of energy and materials."
+                            },
+                            {
+                                "term_de": "Freie Energie",
+                                "definition_de": "Teil der Gesamtenergie, der in physikalische Arbeit umgewandelt werden kann.",
+                                "term_en": "Free Energy",
+                                "definition_en": "Part of total energy that can be converted into physical work."
+                            }
+                        ],
+                        "reflexionsaufgaben": [
+                            {
+                                "question_de": "Wie ändert sich deine Einschätzung technischer Lösungen, wenn du Entropie und Wirkungsgrad einbeziehst?",
+                                "question_en": "How does your assessment of technical solutions change when considering entropy and efficiency?"
+                            },
+                            {
+                                "question_de": "Welche politischen oder ökonomischen Versprechen wirken thermodynamisch fragwürdig?",
+                                "question_en": "Which political or economic promises seem thermodynamically questionable?"
+                            },
+                            {
+                                "question_de": "Wo wäre es sinnvoll, thermodynamische Grundideen in deine Lehre oder Beratung einzubauen?",
+                                "question_en": "Where would it be useful to incorporate thermodynamic principles into your teaching or consulting?"
+                            }
+                        ],
+                        "uebungsaufgaben_verstehen": [
+                            {
+                                "title_de": "Aufgabe 1: Energieformen und Systeme",
+                                "prompt_de": "Beantworten Sie die Fragen zu Energieformen, Kochprozessen, Systemarten und deren Umweltbeziehungen.",
+                                "title_en": "Task 1: Energy Forms and Systems",
+                                "prompt_en": "Answer questions about energy forms, cooking processes, system types and their environmental relationships."
+                            },
+                            {
+                                "title_de": "Aufgabe 2: Hauptsätze der Thermodynamik",
+                                "prompt_de": "Erklären Sie Bedeutung und Formulierungen der Hauptsätze, Unterschiede freier und Wärmeenergie und Beispiele.",
+                                "title_en": "Task 2: Laws of Thermodynamics",
+                                "prompt_en": "Explain meaning and formulations of the laws, differences between free and thermal energy, and examples."
+                            }
+                        ],
+                        "uebungsaufgaben_kreativ": [
+                            {
+                                "title_de": "Aufgabe 3: Thermodynamik und Klima",
+                                "prompt_de": "Erläutern Sie, inwiefern die beiden Hauptsätze der Thermodynamik für das Klimaproblem grundlegend sind.",
+                                "title_en": "Task 3: Thermodynamics and Climate",
+                                "prompt_en": "Explain how the two laws of thermodynamics are fundamental to the climate problem."
+                            }
+                        ],
+                        "uebungsaufgaben_weiterfuehrend": [
+                            {
+                                "title_de": "Aufgabe 4: Anwendungen",
+                                "prompt_de": "a) Vergleichen Sie thermodynamische Aspekte von Diesel- und Elektro-PKW.\n\nb) Diskutieren Sie Energie‑ und Massenerhaltung im Erdsystem.",
+                                "title_en": "Task 4: Applications",
+                                "prompt_en": "a) Compare thermodynamic aspects of diesel and electric cars.\n\nb) Discuss energy and mass conservation in the Earth system."
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "irreversibilitaet",
+                    "cluster": "Zeit",
+                    "concept_title_de": "Irreversibilität",
+                    "concept_title_en": "Irreversibility",
+                    "cards": {
+                        "worum_gehts": {
+                            "text_de": "Irreversibilität beschreibt unumkehrbare Prozesse und Lock-ins als Kriterium für Entscheidungen unter Unwissen.",
+                            "text_en": "Irreversibility describes irreversible processes and lock-ins as criteria for decisions under ignorance."
+                        },
+                        "kerndefinitionen": [
+                            {
+                                "term_de": "Irreversibler Prozess",
+                                "definition_de": "Vorgang, der ohne großen Aufwand oder gar nicht in den Ausgangszustand zurückgeführt werden kann.",
+                                "term_en": "Irreversible Process",
+                                "definition_en": "Process that cannot be returned to initial state without great effort or at all."
+                            },
+                            {
+                                "term_de": "Lock-in-Effekt",
+                                "definition_de": "Pfadabhängiger Zustand, der Wechsel zu besseren Technologien durch frühere Investitionen erschwert.",
+                                "term_en": "Lock-in Effect",
+                                "definition_en": "Path-dependent state making switching to better technologies difficult due to prior investments."
+                            }
+                        ],
+                        "reflexionsaufgaben": [
+                            {
+                                "question_de": "Welche deiner Projekte enthalten Entscheidungen mit Lock‑in‑Risiken?",
+                                "question_en": "Which of your projects contain decisions with lock-in risks?"
+                            },
+                            {
+                                "question_de": "Wie würdest du deine Entscheidungsverfahren ändern, wenn Irreversibilität explizit bewertet wird?",
+                                "question_en": "How would you change your decision procedures if irreversibility were explicitly evaluated?"
+                            },
+                            {
+                                "question_de": "Wo akzeptierst du bewusst irreversible Schritte – und warum?",
+                                "question_en": "Where do you consciously accept irreversible steps – and why?"
+                            }
+                        ],
+                        "uebungsaufgaben_verstehen": [
+                            {
+                                "title_de": "Aufgabe 1: Reversibel oder irreversibel?",
+                                "prompt_de": "Bewerten Sie die Beispiele (Sprünge, Umlauf der Erde, radioaktiver Müll etc.) hinsichtlich Reversibilität und Begründung.",
+                                "title_en": "Task 1: Reversible or Irreversible?",
+                                "prompt_en": "Evaluate the examples (jumps, Earth's orbit, radioactive waste, etc.) regarding reversibility and justification."
+                            }
+                        ],
+                        "uebungsaufgaben_kreativ": [],
+                        "uebungsaufgaben_weiterfuehrend": []
+                    }
+                },
+                {
+                    "id": "evolution",
+                    "cluster": "Zeit",
+                    "concept_title_de": "Evolution",
+                    "concept_title_en": "Evolution",
+                    "cards": {
+                        "worum_gehts": {
+                            "text_de": "Evolution beschreibt Veränderungen von Genotypen und Phänotypen in Biologie, Physik und Ökonomie über die Zeit.",
+                            "text_en": "Evolution describes changes of genotypes and phenotypes in biology, physics, and economics over time."
+                        },
+                        "kerndefinitionen": [
+                            {
+                                "term_de": "Genotyp",
+                                "definition_de": "Möglichkeitenraum eines Systems: Struktur, Regeln und Rahmenbedingungen.",
+                                "term_en": "Genotype",
+                                "definition_en": "Possibility space of a system: structure, rules, and framework conditions."
+                            },
+                            {
+                                "term_de": "Phänotyp",
+                                "definition_de": "Konkrete Realisierung eines Genotyps unter bestimmten Umweltbedingungen.",
+                                "term_en": "Phenotype",
+                                "definition_en": "Concrete realization of a genotype under specific environmental conditions."
+                            },
+                            {
+                                "term_de": "Evolution",
+                                "definition_de": "Prozess der Veränderung eines Systems im Laufe der Zeit.",
+                                "term_en": "Evolution",
+                                "definition_en": "Process of change in a system over time."
+                            }
+                        ],
+                        "reflexionsaufgaben": [
+                            {
+                                "question_de": "Welche Genotyp‑Elemente deiner Organisation sind stabil, welche dynamisch?",
+                                "question_en": "Which genotype elements of your organization are stable, which dynamic?"
+                            },
+                            {
+                                "question_de": "Wo verlässt du dich auf Gleichgewichtsmodelle – und sind sie angesichts evolutorischer Dynamik sinnvoll?",
+                                "question_en": "Where do you rely on equilibrium models – and are they sensible given evolutionary dynamics?"
+                            },
+                            {
+                                "question_de": "Welche Rolle spielen „Dreiecke der Verursachung" in deinem Feld?",
+                                "question_en": "What role do 'triangles of causation' play in your field?"
+                            }
+                        ],
+                        "uebungsaufgaben_verstehen": [
+                            {
+                                "title_de": "Aufgabe 1: Genotyp und Phänotyp",
+                                "prompt_de": "Beantworten Sie die Fragen zu Beispielen, Einflussfaktoren und Geschwindigkeiten von Genotypen in Biologie, Physik, Ökonomie.",
+                                "title_en": "Task 1: Genotype and Phenotype",
+                                "prompt_en": "Answer questions about examples, influencing factors, and speeds of genotypes in biology, physics, economics."
+                            },
+                            {
+                                "title_de": "Aufgabe 2: Evolutionsbegriff",
+                                "prompt_de": "Nennen Sie evolutorische Prozesse in Biologie, Physik und Ökonomie und diskutieren Sie die Definition von Evolution.",
+                                "title_en": "Task 2: Evolution Concept",
+                                "prompt_en": "Name evolutionary processes in biology, physics, and economics and discuss the definition of evolution."
+                            }
+                        ],
+                        "uebungsaufgaben_kreativ": [
+                            {
+                                "title_de": "Aufgabe 3: Genotypen entwerfen",
+                                "prompt_de": "Diskutieren Sie mögliche Genotypen und Phänotypen ökologischer und politischer Systeme und ihre Entwicklungsgeschwindigkeiten.",
+                                "title_en": "Task 3: Designing Genotypes",
+                                "prompt_en": "Discuss possible genotypes and phenotypes of ecological and political systems and their development speeds."
+                            }
+                        ],
+                        "uebungsaufgaben_weiterfuehrend": [
+                            {
+                                "title_de": "Aufgabe 4–6: Dreiecke und Gleichgewichte",
+                                "prompt_de": "Arbeiten Sie die Unterschiede zwischen Erfindung und Innovation sowie Gleichgewichtsbegriffe anhand der genannten Aufgaben aus.",
+                                "title_en": "Task 4–6: Triangles and Equilibria",
+                                "prompt_en": "Work out differences between invention and innovation as well as equilibrium concepts using the mentioned tasks."
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "unwissen",
+                    "cluster": "Menschheit",
+                    "concept_title_de": "Unwissen",
+                    "concept_title_en": "Ignorance",
+                    "cards": {
+                        "worum_gehts": {
+                            "text_de": "Unwissen wird typisiert und als unvermeidliche Größe in Planung, Risikoabschätzung und Transformation behandelt.",
+                            "text_en": "Ignorance is typified and treated as an unavoidable factor in planning, risk assessment, and transformation."
+                        },
+                        "kerndefinitionen": [
+                            {
+                                "term_de": "Individuelles Unwissen",
+                                "definition_de": "Wissenslücken einer Person zu bestimmten Themen oder Zusammenhängen.",
+                                "term_en": "Individual Ignorance",
+                                "definition_en": "Knowledge gaps of a person regarding certain topics or relationships."
+                            },
+                            {
+                                "term_de": "Kollektives Unwissen",
+                                "definition_de": "Wissenslücken einer Gruppe oder Gesellschaft zu bestimmten Fragen.",
+                                "term_en": "Collective Ignorance",
+                                "definition_en": "Knowledge gaps of a group or society regarding certain questions."
+                            },
+                            {
+                                "term_de": "Offenes Unwissen",
+                                "definition_de": "Bewusstes Eingeständnis, dass Wissen fehlt und Lücken existieren.",
+                                "term_en": "Open Ignorance",
+                                "definition_en": "Conscious admission that knowledge is lacking and gaps exist."
+                            },
+                            {
+                                "term_de": "Geschlossenes Unwissen",
+                                "definition_de": "Nichtbemerktes Unwissen, bei dem sich Akteure ihrer Lücken nicht bewusst sind.",
+                                "term_en": "Closed Ignorance",
+                                "definition_en": "Unnoticed ignorance where actors are unaware of their gaps."
+                            }
+                        ],
+                        "reflexionsaufgaben": [
+                            {
+                                "question_de": "Welche Differenzierungen von Unwissen waren in deinen Projekten bislang unterbelichtet?",
+                                "question_en": "Which differentiations of ignorance have been underexposed in your projects so far?"
+                            },
+                            {
+                                "question_de": "Wo warst du rückblickend „geschlossen unwissend" – mit welchen Folgen?",
+                                "question_en": "Where were you retrospectively 'closed ignorant' – with what consequences?"
+                            },
+                            {
+                                "question_de": "Wie kannst du offenes Unwissen im Team explizit machen, ohne Autorität zu unterminieren?",
+                                "question_en": "How can you make open ignorance explicit in the team without undermining authority?"
+                            }
+                        ],
+                        "uebungsaufgaben_verstehen": [
+                            {
+                                "title_de": "Aufgabe 1: Formen von Unwissen",
+                                "prompt_de": "Analysieren Sie die Beispiele: Handelt es sich um Unwissen? Wer ist unwissend, ist es reduzierbar oder nicht?",
+                                "title_en": "Task 1: Forms of Ignorance",
+                                "prompt_en": "Analyze the examples: Is it ignorance? Who is ignorant, is it reducible or not?"
+                            }
+                        ],
+                        "uebungsaufgaben_kreativ": [
+                            {
+                                "title_de": "Aufgabe 2: Nachhaltigkeitsmanagement und Unwissen",
+                                "prompt_de": "Sie sind Nachhaltigkeitsmanager:in in einem Metallbetrieb. Wo könnten Wissenslücken bestehen, und wie reduzieren Sie sie?",
+                                "title_en": "Task 2: Sustainability Management and Ignorance",
+                                "prompt_en": "You are a sustainability manager in a metal plant. Where might knowledge gaps exist, and how do you reduce them?"
+                            }
+                        ],
+                        "uebungsaufgaben_weiterfuehrend": [
+                            {
+                                "title_de": "Aufgabe 3–4: Risiko, Unsicherheit, Unwissen",
+                                "prompt_de": "Ordnen Sie Beispiele den Kategorien Risiko, Unsicherheit, Unwissen zu und diskutieren Sie Anwendungen im Chemieunternehmen.",
+                                "title_en": "Task 3–4: Risk, Uncertainty, Ignorance",
+                                "prompt_en": "Classify examples into categories risk, uncertainty, ignorance and discuss applications in chemical companies."
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "kuppelproduktion",
+                    "cluster": "Natur",
+                    "concept_title_de": "Kuppelproduktion",
+                    "concept_title_en": "Joint Production",
+                    "cards": {
+                        "worum_gehts": {
+                            "text_de": "Kuppelproduktion macht sichtbar, dass Produktion immer mehrere Outputs erzeugt und Umweltprobleme strukturell entstehen.",
+                            "text_en": "Joint production reveals that production always generates multiple outputs and environmental problems arise structurally."
+                        },
+                        "kerndefinitionen": [
+                            {
+                                "term_de": "Kuppelproduktion",
+                                "definition_de": "Prozess, bei dem neben gewünschten Produkten zwangsläufig weitere Outputs entstehen.",
+                                "term_en": "Joint Production",
+                                "definition_en": "Process where additional outputs inevitably arise alongside desired products."
+                            },
+                            {
+                                "term_de": "Externer Effekt",
+                                "definition_de": "Wirkung eines Handelns auf Dritte, die nicht über den Marktpreis abgegolten wird.",
+                                "term_en": "External Effect",
+                                "definition_en": "Effect of an action on third parties not compensated through market price."
+                            }
+                        ],
+                        "reflexionsaufgaben": [
+                            {
+                                "question_de": "Wie verändert sich deine Sicht auf Verursacher von Umweltproblemen, wenn du Kuppelproduktion fokussierst?",
+                                "question_en": "How does your view of causes of environmental problems change when focusing on joint production?"
+                            },
+                            {
+                                "question_de": "Wo wäre es hilfreich, Kuppelprodukte bereits im Design von Politik oder Technologien mitzudenken?",
+                                "question_en": "Where would it be helpful to consider joint products in the design of policies or technologies?"
+                            },
+                            {
+                                "question_de": "Welche Kuppelproduktionen ökologischer Systeme sollten in deinen Analysen stärker beachtet werden?",
+                                "question_en": "Which joint productions of ecological systems should be more strongly considered in your analyses?"
+                            }
+                        ],
+                        "uebungsaufgaben_verstehen": [
+                            {
+                                "title_de": "Aufgabe 1–3: Kuppelproduktion und Thermodynamik",
+                                "prompt_de": "Bearbeiten Sie die Fragen zu Mensch–Natur‑Beziehungen, Definition von Kuppelproduktion und thermodynamischen Gründen.",
+                                "title_en": "Task 1–3: Joint Production and Thermodynamics",
+                                "prompt_en": "Work on questions about human-nature relationships, definition of joint production, and thermodynamic reasons."
+                            }
+                        ],
+                        "uebungsaufgaben_kreativ": [
+                            {
+                                "title_de": "Aufgabe 6: Ozonloch und Kuppelproduktion",
+                                "prompt_de": "Erläutern Sie, warum das Ozonloch als Folge von Kuppelproduktion bei FCKW‑Nutzung verstanden werden kann.",
+                                "title_en": "Task 6: Ozone Hole and Joint Production",
+                                "prompt_en": "Explain why the ozone hole can be understood as a consequence of joint production in CFC use."
+                            }
+                        ],
+                        "uebungsaufgaben_weiterfuehrend": [
+                            {
+                                "title_de": "Aufgabe 5: Wirkmächtigkeit des Konzepts",
+                                "prompt_de": "Diskutieren Sie, warum Kuppelproduktion ein allgemein anwendbares Konzept für Umweltprobleme und Wachstumsgrenzen ist.",
+                                "title_en": "Task 5: Potency of the Concept",
+                                "prompt_en": "Discuss why joint production is a generally applicable concept for environmental problems and growth limits."
+                            }
+                        ]
+                    }
+                }
+            ]
+        };
+
+        let currentLang = 'de';
+        let currentCluster = null;
+        let currentConcept = null;
+        let currentCardType = null;
+        let currentCardIndex = 0;
+
+        const translations = {
+            de: {
+                mainTitle: "Nachhaltiges Handeln in Wirtschaft und Gesellschaft",
+                mainSubtitle: "Interaktive Lernapp zur Vertiefung der Buchinhalte",
+                backToStart: "← Zurück zur Startseite",
+                backToClusters: "← Zurück zu Clustern",
+                backToConcepts: "← Zurück zu Konzepten",
+                backToCardTypes: "← Zurück zu Kartentypen",
+                selectCluster: "Wähle einen Cluster",
+                selectConcept: "Wähle ein Konzept",
+                selectCardType: "Wähle einen Kartentyp",
+                conceptsCount: "Konzepte",
+                cardTypes: {
+                    worum_gehts: {
+                        title: "Worum geht's?",
+                        desc: "Überblick über das Konzept"
+                    },
+                    kerndefinitionen: {
+                        title: "Kerndefinitionen",
+                        desc: "Zentrale Begriffe verstehen"
+                    },
+                    reflexionsaufgaben: {
+                        title: "Reflexionsaufgaben",
+                        desc: "Persönliche Reflexion"
+                    },
+                    uebungsaufgaben_verstehen: {
+                        title: "Übungsaufgaben: Verstehen",
+                        desc: "Grundverständnis vertiefen"
+                    },
+                    uebungsaufgaben_kreativ: {
+                        title: "Übungsaufgaben: Kreativ",
+                        desc: "Kreativ anwenden"
+                    },
+                    uebungsaufgaben_weiterfuehrend: {
+                        title: "Übungsaufgaben: Weiterführend",
+                        desc: "Vertiefende Analyse"
+                    }
+                },
+                previous: "← Vorherige",
+                next: "Nächste →",
+                cardOf: "von"
+            },
+            en: {
+                mainTitle: "Sustainable Action in Economy and Society",
+                mainSubtitle: "Interactive learning app for deepening book contents",
+                backToStart: "← Back to start",
+                backToClusters: "← Back to clusters",
+                backToConcepts: "← Back to concepts",
+                backToCardTypes: "← Back to card types",
+                selectCluster: "Choose a cluster",
+                selectConcept: "Choose a concept",
+                selectCardType: "Choose a card type",
+                conceptsCount: "Concepts",
+                cardTypes: {
+                    worum_gehts: {
+                        title: "What's it about?",
+                        desc: "Overview of the concept"
+                    },
+                    kerndefinitionen: {
+                        title: "Core Definitions",
+                        desc: "Understand central terms"
+                    },
+                    reflexionsaufgaben: {
+                        title: "Reflection Tasks",
+                        desc: "Personal reflection"
+                    },
+                    uebungsaufgaben_verstehen: {
+                        title: "Practice Tasks: Understanding",
+                        desc: "Deepen basic understanding"
+                    },
+                    uebungsaufgaben_kreativ: {
+                        title: "Practice Tasks: Creative",
+                        desc: "Apply creatively"
+                    },
+                    uebungsaufgaben_weiterfuehrend: {
+                        title: "Practice Tasks: Advanced",
+                        desc: "In-depth analysis"
+                    }
+                },
+                previous: "← Previous",
+                next: "Next →",
+                cardOf: "of"
+            }
+        };
+
+        function t(key) {
+            const keys = key.split('.');
+            let value = translations[currentLang];
+            for (const k of keys) {
+                value = value[k];
+            }
+            return value;
+        }
+
+        function updateBreadcrumb() {
+            const breadcrumb = document.getElementById('breadcrumb');
+            let html = '';
+
+            if (currentCluster) {
+                html += `<span class="breadcrumb-item">${currentCluster}</span>`;
+            }
+            if (currentConcept) {
+                const concept = appData.concepts.find(c => c.id === currentConcept);
+                html += `<span class="breadcrumb-separator">›</span>`;
+                html += `<span class="breadcrumb-item">${currentLang === 'de' ? concept.concept_title_de : concept.concept_title_en}</span>`;
+            }
+            if (currentCardType) {
+                html += `<span class="breadcrumb-separator">›</span>`;
+                html += `<span class="breadcrumb-current">${t('cardTypes.' + currentCardType + '.title')}</span>`;
+            }
+
+            breadcrumb.innerHTML = html;
+            breadcrumb.classList.toggle('hidden', html === '');
+        }
+
+        function renderClusters() {
+            const view = document.getElementById('clusterView');
+            const clusters = appData.app_settings.navigation.clusters;
+
+            let html = `<h2 style="grid-column: 1/-1; color: var(--color-primary); margin-bottom: var(--space-md);">${t('selectCluster')}</h2>`;
+
+            clusters.forEach(cluster => {
+                const count = appData.concepts.filter(c => c.cluster === cluster).length;
+                html += `
+                    <div class="cluster-card" onclick="selectCluster('${cluster}')" role="button" tabindex="0" onkeypress="if(event.key==='Enter')selectCluster('${cluster}')">
+                        <h2>${cluster}</h2>
+                        <p class="concept-count">${count} ${t('conceptsCount')}</p>
+                    </div>
+                `;
+            });
+
+            view.innerHTML = html;
+            view.classList.remove('hidden');
+            document.getElementById('conceptView').classList.add('hidden');
+            document.getElementById('cardTypeView').classList.add('hidden');
+            document.getElementById('cardContentView').classList.add('hidden');
+            currentCluster = null;
+            currentConcept = null;
+            currentCardType = null;
+            updateBreadcrumb();
+        }
+
+        function selectCluster(cluster) {
+            currentCluster = cluster;
+            renderConcepts();
+        }
+
+        function renderConcepts() {
+            const concepts = appData.concepts.filter(c => c.cluster === currentCluster);
+            const view = document.getElementById('conceptView');
+
+            let html = `
+                <button class="back-btn" onclick="renderClusters()">
+                    ${t('backToClusters')}
+                </button>
+                <h2 style="color: var(--color-primary); margin: var(--space-lg) 0;">${t('selectConcept')}</h2>
+                <div class="concept-list">
+            `;
+
+            concepts.forEach(concept => {
+                const title = currentLang === 'de' ? concept.concept_title_de : concept.concept_title_en;
+                const desc = currentLang === 'de' ? concept.cards.worum_gehts.text_de : concept.cards.worum_gehts.text_en;
+                html += `
+                    <div class="concept-item" onclick="selectConcept('${concept.id}')" role="button" tabindex="0" onkeypress="if(event.key==='Enter')selectConcept('${concept.id}')">
+                        <h3>${title}</h3>
+                        <p style="color: var(--color-text-light); margin-top: var(--space-xs);">${desc}</p>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            view.innerHTML = html;
+
+            document.getElementById('clusterView').classList.add('hidden');
+            view.classList.remove('hidden');
+            document.getElementById('cardTypeView').classList.add('hidden');
+            document.getElementById('cardContentView').classList.add('hidden');
+            updateBreadcrumb();
+        }
+
+        function selectConcept(conceptId) {
+            currentConcept = conceptId;
+            renderCardTypes();
+        }
+
+        function renderCardTypes() {
+            const concept = appData.concepts.find(c => c.id === currentConcept);
+            const view = document.getElementById('cardTypeView');
+
+            const cardTypeKeys = [
+                'worum_gehts',
+                'kerndefinitionen',
+                'reflexionsaufgaben',
+                'uebungsaufgaben_verstehen',
+                'uebungsaufgaben_kreativ',
+                'uebungsaufgaben_weiterfuehrend'
+            ];
+
+            let html = `
+                <button class="back-btn" onclick="renderConcepts()">
+                    ${t('backToConcepts')}
+                </button>
+                <h2 style="color: var(--color-primary); margin: var(--space-lg) 0;">${t('selectCardType')}</h2>
+                <div class="card-type-grid">
+            `;
+
+            cardTypeKeys.forEach(key => {
+                const hasContent = concept.cards[key] && 
+                    (Array.isArray(concept.cards[key]) ? concept.cards[key].length > 0 : 
+                     (concept.cards[key].text_de || concept.cards[key].text_en));
+
+                if (hasContent) {
+                    html += `
+                        <button class="card-type-btn" onclick="selectCardType('${key}')" type="button">
+                            <h4>${t('cardTypes.' + key + '.title')}</h4>
+                            <p>${t('cardTypes.' + key + '.desc')}</p>
+                        </button>
+                    `;
+                }
+            });
+
+            html += '</div>';
+            view.innerHTML = html;
+
+            document.getElementById('conceptView').classList.add('hidden');
+            view.classList.remove('hidden');
+            document.getElementById('cardContentView').classList.add('hidden');
+            updateBreadcrumb();
+        }
+
+        function selectCardType(type) {
+            currentCardType = type;
+            currentCardIndex = 0;
+            renderCardContent();
+        }
+
+        function renderCardContent() {
+            const concept = appData.concepts.find(c => c.id === currentConcept);
+            const view = document.getElementById('cardContentView');
+            const title = currentLang === 'de' ? concept.concept_title_de : concept.concept_title_en;
+
+            let contentHtml = '';
+
+            if (currentCardType === 'worum_gehts') {
+                const text = currentLang === 'de' ? concept.cards.worum_gehts.text_de : concept.cards.worum_gehts.text_en;
+                contentHtml = `<div class="card-content">${text}</div>`;
+            }
+            else if (currentCardType === 'kerndefinitionen') {
+                const defs = concept.cards.kerndefinitionen;
+                contentHtml = '<div class="definition-list">';
+                defs.forEach(def => {
+                    const term = currentLang === 'de' ? def.term_de : (def.term_en || def.term_de);
+                    const definition = currentLang === 'de' ? def.definition_de : (def.definition_en || def.definition_de);
+                    contentHtml += `
+                        <div class="definition-item">
+                            <div class="definition-term">${term}</div>
+                            <div class="definition-text">${definition}</div>
+                        </div>
+                    `;
+                });
+                contentHtml += '</div>';
+            }
+            else if (currentCardType === 'reflexionsaufgaben') {
+                const questions = concept.cards.reflexionsaufgaben;
+                contentHtml = '<div class="question-list">';
+                questions.forEach((q, i) => {
+                    const question = currentLang === 'de' ? q.question_de : (q.question_en || q.question_de);
+                    contentHtml += `
+                        <div class="question-item">
+                            <strong>${i + 1}.</strong> ${question}
+                        </div>
+                    `;
+                });
+                contentHtml += '</div>';
+            }
+            else {
+                const tasks = concept.cards[currentCardType];
+                if (tasks && tasks.length > 0) {
+                    contentHtml = '<div class="task-list">';
+                    tasks.forEach(task => {
+                        const taskTitle = currentLang === 'de' ? task.title_de : (task.title_en || task.title_de);
+                        const prompt = currentLang === 'de' ? task.prompt_de : (task.prompt_en || task.prompt_de);
+                        contentHtml += `
+                            <div class="task-item">
+                                <div class="task-title">${taskTitle}</div>
+                                <div class="task-prompt">${prompt}</div>
+                            </div>
+                        `;
+                    });
+                    contentHtml += '</div>';
+                }
+            }
+
+            const html = `
+                <button class="back-btn" onclick="renderCardTypes()">
+                    ${t('backToCardTypes')}
+                </button>
+                <div class="card-viewer">
+                    <div class="card-header">
+                        <div style="font-size: 0.875rem; color: var(--color-text-light); margin-bottom: var(--space-xs);">
+                            ${title}
+                        </div>
+                        <h2 class="card-title">${t('cardTypes.' + currentCardType + '.title')}</h2>
+                    </div>
+                    ${contentHtml}
+                </div>
+            `;
+
+            view.innerHTML = html;
+            document.getElementById('cardTypeView').classList.add('hidden');
+            view.classList.remove('hidden');
+            updateBreadcrumb();
+        }
+
+        // Event delegation for better compatibility
+        document.addEventListener('click', (e) => {
+            const target = e.target;
+            
+            // Handle cluster cards
+            const clusterCard = target.closest('.cluster-card');
+            if (clusterCard && clusterCard.onclick) {
+                const clusterName = clusterCard.textContent.match(/Natur|Zeit|Menschheit/)[0];
+                selectCluster(clusterName);
+                return;
+            }
+            
+            // Handle concept items
+            const conceptItem = target.closest('.concept-item');
+            if (conceptItem && conceptItem.onclick) {
+                const match = conceptItem.onclick.toString().match(/selectConcept\('([^']+)'\)/);
+                if (match) selectConcept(match[1]);
+                return;
+            }
+            
+            // Handle card type buttons
+            const cardTypeBtn = target.closest('.card-type-btn');
+            if (cardTypeBtn && cardTypeBtn.onclick) {
+                const match = cardTypeBtn.onclick.toString().match(/selectCardType\('([^']+)'\)/);
+                if (match) selectCardType(match[1]);
+                return;
+            }
+        });
+
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentLang = btn.dataset.lang;
+                document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                document.getElementById('mainTitle').textContent = t('mainTitle');
+                document.getElementById('mainSubtitle').textContent = t('mainSubtitle');
+
+                if (currentCluster === null) {
+                    renderClusters();
+                } else if (currentConcept === null) {
+                    renderConcepts();
+                } else if (currentCardType === null) {
+                    renderCardTypes();
+                } else {
+                    renderCardContent();
+                }
+            });
+        });
+
+        renderClusters();
+    </script>
+</body>
+</html>
+
