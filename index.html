@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINE Lernapp - Mapping the Interplay between Nature and Economy</title>
+    <style>
+        :root {
+            --nature-color: #4A7C59;
+            --nature-light: #E8F5E9;
+            --time-color: #8B6F47;
+            --time-light: #FFF8E1;
+            --humanity-color: #5B7C8D;
+            --humanity-light: #E3F2FD;
+            --card-bg: #FFFFFF;
+            --text-primary: #2C3E50;
+            --text-secondary: #546E7A;
+            --border-color: #E0E0E0;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .language-switch {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .language-switch button {
+            padding: 8px 20px;
+            border: 2px solid var(--border-color);
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .language-switch button.active {
+            background: var(--text-primary);
+            color: white;
+            border-color: var(--text-primary);
+        }
+
+        .cluster-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .cluster-tab {
+            flex: 1;
+            min-width: 250px;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 3px solid transparent;
+        }
+
+        .cluster-tab h2 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .cluster-tab p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .cluster-tab.nature {
+            background: var(--nature-light);
+            color: var(--nature-color);
+        }
+
+        .cluster-tab.nature.active {
+            border-color: var(--nature-color);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .cluster-tab.time {
+            background: var(--time-light);
+            color: var(--time-color);
+        }
+
+        .cluster-tab.time.active {
+            border-color: var(--time-color);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .cluster-tab.humanity {
+            background: var(--humanity-light);
+            color: var(--humanity-color);
+        }
+
+        .cluster-tab.humanity.active {
+            border-color: var(--humanity-color);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .concepts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .concept-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: var(--shadow);
+            border-left: 5px solid;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .concept-card.nature {
+            border-left-color: var(--nature-color);
+        }
+
+        .concept-card.time {
+            border-left-color: var(--time-color);
+        }
+
+        .concept-card.humanity {
+            border-left-color: var(--humanity-color);
+        }
+
+        .concept-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .concept-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .learning-cards-view {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .learning-cards-view.active {
+            display: block;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--text-secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: var(--text-primary);
+        }
+
+        .concept-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--border-color);
+        }
+
+        .concept-header h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .card-type-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .card-type-tab {
+            padding: 12px 24px;
+            background: var(--border-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .card-type-tab.active {
+            color: white;
+        }
+
+        .card-type-tab.nature.active {
+            background: var(--nature-color);
+        }
+
+        .card-type-tab.time.active {
+            background: var(--time-color);
+        }
+
+        .card-type-tab.humanity.active {
+            background: var(--humanity-color);
+        }
+
+        .card-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .card-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-section {
+            background: #F8F9FA;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .card-section h3 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .card-section p, .card-section li {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .card-section ul, .card-section ol {
+            margin-left: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .edit-icon {
+            float: right;
+            opacity: 0.5;
+            font-size: 0.9rem;
+        }
+
+        .edit-button {
+            background: var(--text-primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 15px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .edit-button:hover {
+            background: var(--text-secondary);
+        }
+
+        .edit-mode {
+            background: #FFF9C4;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .edit-mode textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
+        }
+
+        .edit-mode .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .edit-mode button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .save-button {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .save-button:hover {
+            background: #45a049;
+        }
+
+        .cancel-button {
+            background: #f44336;
+            color: white;
+        }
+
+        .cancel-button:hover {
+            background: #da190b;
+        }
+
+        .edit-hint {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .cluster-tabs {
+                flex-direction: column;
+            }
+
+            .cluster-tab {
+                min-width: 100%;
+            }
+
+            .concepts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-type-tabs {
+                flex-direction: column;
+            }
+
+            .card-type-tab {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 data-de="MINE Lernapp" data-en="MINE Learning App">MINE Lernapp</h1>
+            <p data-de="Mapping the Interplay between Nature and Economy" data-en="Mapping the Interplay between Nature and Economy">Mapping the Interplay between Nature and Economy</p>
+            <p style="margin-top: 20px; font-size: 1rem; line-height: 1.7; max-width: 900px; margin-left: auto; margin-right: auto;" data-de="Mithilfe dieser App können sich Nutzer:innen mit den Arbeiten und Konzepten der Heidelberger Schule für Ökologische Ökonomie auseinandersetzen. Die Inhalte beruhen auf dem im Jahr 2023 erschienenen Buch „Nachhaltiges Handeln in Wirtschaft und Gesellschaft. Orientierung für den Wandel". Dieses wurde von Malte Faber, Reiner Manstetten, Marco Rudolf, Marc Frick und Mi-Yong Becker verfasst." data-en="This app enables users to engage with the work and concepts of the Heidelberg School of Ecological Economics. The content is based on the book „Sustainable Action in Economy and Society. Orientation for Transformation" published in 2023 by Malte Faber, Reiner Manstetten, Marco Rudolf, Marc Frick, and Mi-Yong Becker.">Mithilfe dieser App können sich Nutzer:innen mit den Arbeiten und Konzepten der Heidelberger Schule für Ökologische Ökonomie auseinandersetzen. Die Inhalte beruhen auf dem im Jahr 2023 erschienenen Buch „Nachhaltiges Handeln in Wirtschaft und Gesellschaft. Orientierung für den Wandel". Dieses wurde von Malte Faber, Reiner Manstetten, Marco Rudolf, Marc Frick und Mi-Yong Becker verfasst.</p>
+            <div class="language-switch">
+                <button class="active" onclick="switchLanguage('de')">Deutsch</button>
+                <button onclick="switchLanguage('en')">English</button>
+            </div>
+        </div>
+
+        <!-- Main View: Cluster Selection -->
+        <div id="mainView">
+            <div class="cluster-tabs">
+                <div class="cluster-tab nature active" onclick="selectCluster('nature')">
+                    <h2 data-de="🌱 Natur" data-en="🌱 Nature">🌱 Natur</h2>
+                    <p data-de="Wie entwickeln sich die Grundlagen des Lebens?" data-en="How do the basics of life evolve?">Wie entwickeln sich die Grundlagen des Lebens?</p>
+                </div>
+                <div class="cluster-tab time" onclick="selectCluster('time')">
+                    <h2 data-de="⏰ Zeit" data-en="⏰ Time">⏰ Zeit</h2>
+                    <p data-de="Die zeitlichen Dimensionen der Nachhaltigkeit" data-en="Temporal dimensions of sustainability">Die zeitlichen Dimensionen der Nachhaltigkeit</p>
+                </div>
+                <div class="cluster-tab humanity" onclick="selectCluster('humanity')">
+                    <h2 data-de="👥 Menschheit" data-en="👥 Humanity">👥 Menschheit</h2>
+                    <p data-de="Menschenbilder und gesellschaftliches Handeln" data-en="Human images and social action">Menschenbilder und gesellschaftliches Handeln</p>
+                </div>
+            </div>
+
+            <div id="conceptsContainer" class="concepts-grid">
+                <!-- Concepts will be dynamically loaded here -->
+            </div>
+        </div>
+
+        <!-- Learning Cards View -->
+        <div id="learningCardsView" class="learning-cards-view">
+            <button class="back-button" onclick="backToMain()">← <span data-de="Zurück zur Übersicht" data-en="Back to Overview">Zurück zur Übersicht</span></button>
+            
+            <div class="concept-header">
+                <h2 id="conceptTitle"></h2>
+            </div>
+
+            <div class="card-type-tabs" id="cardTypeTabs">
+                <!-- Card type tabs will be dynamically loaded -->
+            </div>
+
+            <div id="cardContentContainer">
+                <!-- Card content will be dynamically loaded -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application state
+        let currentLanguage = 'de';
+        let currentCluster = 'nature';
+        let currentConcept = null;
+        let currentCardType = null;
+        let editMode = false;
+
+        // Data structure for concepts
+        const concepts = {
+            nature: [
+                {
+                    id: 'thermodynamik',
+                    title: { de: 'Thermodynamik', en: 'Thermodynamics' },
+                    cards: {
+                        worumgehts: {
+                            title: { de: 'Worum geht\'s', en: 'What is it about' },
+                            content: { 
+                                de: 'Anhand der Kuchen-Analogie werden die klassischen Elemente nachhaltiger Entwicklung entfaltet: begrenzte Ressourcen, wachsende Zahl von Gästen und die Notwendigkeit, heute und morgen ein gutes Leben für alle zu ermöglichen. Die Brundtland-Definition wird mit einem anspruchsvollen Gerechtigkeitsbegriff verknüpft, der Verteilungs- und Ordnungsgerechtigkeit umfasst und intra- wie intergenerationale Dimensionen verbindet.',
+                                en: 'Using the cake analogy, the classic elements of sustainable development are explored: limited resources, growing number of guests, and the necessity to enable a good life for all today and tomorrow. The Brundtland definition is linked with an ambitious concept of justice that encompasses distributive and procedural justice, connecting intra- and intergenerational dimensions.'
+                            }
+                        },
+                        kerndefinitionen: {
+                            title: { de: 'Kerndefinitionen', en: 'Key Definitions' },
+                            content: { 
+                                de: '<strong>Brundtland-Definition:</strong> Nachhaltige Entwicklung ermöglicht der gegenwärtigen Generation ein gutes Leben, ohne künftigen Generationen diese Möglichkeit zu nehmen.<br><br><strong>Verteilungsgerechtigkeit:</strong> Faire Aufteilung von Ressourcen und Chancen.<br><br><strong>Ordnungsgerechtigkeit:</strong> Umfasst Freiheit, Frieden, Stabilität und Partizipation.<br><br><strong>Suffizienz:</strong> Lösungsraum jenseits des Wachstumsparadigmas - das richtige Maß finden.',
+                                en: '<strong>Brundtland Definition:</strong> Sustainable development enables the present generation to live well without depriving future generations of this possibility.<br><br><strong>Distributive Justice:</strong> Fair allocation of resources and opportunities.<br><br><strong>Procedural Justice:</strong> Encompasses freedom, peace, stability, and participation.<br><br><strong>Sufficiency:</strong> Solution space beyond the growth paradigm - finding the right measure.'
+                            }
+                        },
+                        reflexionsaufgaben: {
+                            title: { de: 'Reflexionsaufgaben', en: 'Reflection Questions' },
+                            content: {
+                                de: '<ol><li>Wo siehst du in deiner Praxis Spannungen zwischen intra- und intergenerationaler Gerechtigkeit - und wie würdest du sie mit dem „Korridor der Bedürfnisse" fassen?</li><li>Welche deiner eigenen Konsummuster wären im Sinne des vorgestellten Suffizienzbegriffs zu hoch, welche zu niedrig?</li><li>Wie würdest du die 17 SDGs mit dem im Kapitel ausgearbeiteten Gerechtigkeitsbegriff (Ordnung, Verteilung, Partizipation) ins Verhältnis setzen?</li></ol>',
+                                en: '<ol><li>Where do you see tensions in your practice between intra- and intergenerational justice - and how would you frame them with the "corridor of needs"?</li><li>Which of your own consumption patterns would be too high or too low according to the sufficiency concept presented?</li><li>How would you relate the 17 SDGs to the concept of justice (order, distribution, participation) developed in the chapter?</li></ol>'
+                            }
+                        },
+                        ubungsaufgaben: {
+                            title: { de: 'Übungsaufgaben', en: 'Practice Exercises' },
+                            content: {
+                                de: '<strong>Aufgabe 1:</strong><br>a) Beschreiben Sie den Homo Oeconomicus und den Homo Politicus.<br>b) Erläutern Sie die Unterschiede zwischen den beiden Konzepten.<br>c) Geben Sie je ein Beispiel für eine Entscheidungssituation des H.O. und des H.P.<br><br><strong>Kreativaufgabe:</strong><br>Diskutieren Sie: Kann der Homo Oeconomicus das Klimaproblem lösen? Argumentieren Sie sowohl für als auch gegen diese These.',
+                                en: '<strong>Task 1:</strong><br>a) Describe Homo Oeconomicus and Homo Politicus.<br>b) Explain the differences between the two concepts.<br>c) Provide an example each for a decision situation of H.O. and H.P.<br><br><strong>Creative Task:</strong><br>Discuss: Can Homo Oeconomicus solve the climate problem? Argue both for and against this thesis.'
+                            }
+                        }
+                    }
+                },
+                {
+                    id: 'werte-normen',
+                    title: { de: 'Werte, Normen und Ziele', en: 'Values, Norms and Goals' },
+                    cards: {
+                        worumgehts: {
+                            title: { de: 'Worum geht\'s', en: 'What is it about' },
+                            content: {
+                                de: 'Das Kapitel entwickelt eine Hierarchie normativer Orientierung: Werte sind grundlegende Überzeugungen (z.B. Freiheit, Gerechtigkeit), Normen konkretisieren Werte in Handlungsregeln (z.B. Menschenrechte), Ziele sind operationalisierte Zwecke mit Zeithorizont (z.B. Klimaneutralität 2045). Die drei Ebenen stehen in wechselseitiger Beziehung und müssen für nachhaltige Entwicklung explizit gemacht werden.',
+                                en: 'The chapter develops a hierarchy of normative orientation: Values are fundamental convictions (e.g., freedom, justice), norms concretize values into action rules (e.g., human rights), goals are operationalized purposes with time horizons (e.g., climate neutrality 2045). The three levels are interrelated and must be made explicit for sustainable development.'
+                            }
+                        },
+                        kerndefinitionen: {
+                            title: { de: 'Kerndefinitionen', en: 'Key Definitions' },
+                            content: {
+                                de: '<strong>Werte:</strong> Grundlegende, abstrakte Überzeugungen über das Wünschenswerte (z.B. Freiheit, Gleichheit, Solidarität, Gerechtigkeit).<br><br><strong>Normen:</strong> Konkrete Handlungsregeln und Standards, die Werte umsetzen (z.B. Menschenrechte, Umweltstandards, Verfassungsprinzipien).<br><br><strong>Ziele:</strong> Operationalisierte, messbare Zwecke mit Zeithorizont (z.B. 1,5°C-Ziel, SDGs bis 2030).<br><br><strong>Normative Kohärenz:</strong> Werte, Normen und Ziele sollten sich gegenseitig stützen und nicht widersprechen.',
+                                en: '<strong>Values:</strong> Fundamental, abstract convictions about the desirable (e.g., freedom, equality, solidarity, justice).<br><br><strong>Norms:</strong> Concrete action rules and standards that implement values (e.g., human rights, environmental standards, constitutional principles).<br><br><strong>Goals:</strong> Operationalized, measurable purposes with time horizons (e.g., 1.5°C target, SDGs by 2030).<br><br><strong>Normative Coherence:</strong> Values, norms, and goals should mutually support each other and not contradict.'
+                            }
+                        },
+                        reflexionsaufgaben: {
+                            title: { de: 'Reflexionsaufgaben', en: 'Reflection Questions' },
+                            content: {
+                                de: '<ol><li>Welche impliziten Werte liegen deinen aktuellen Projekten zugrunde - und sind diese mit den expliziten Zielen kohärent?</li><li>Wo in deiner Organisation gibt es Zielkonflikte, die auf unterschiedliche oder widersprüchliche Wertehierarchien zurückgehen?</li><li>Wie könntest du die Werte-Normen-Ziele-Hierarchie nutzen, um Nachhaltigkeitsziele klarer zu kommunizieren?</li></ol>',
+                                en: '<ol><li>Which implicit values underlie your current projects - and are these coherent with explicit goals?</li><li>Where in your organization are there goal conflicts that trace back to different or contradictory value hierarchies?</li><li>How could you use the values-norms-goals hierarchy to communicate sustainability goals more clearly?</li></ol>'
+                            }
+                        },
+                        ubungsaufgaben: {
+                            title: { de: 'Übungsaufgaben', en: 'Practice Exercises' },
+                            content: {
+                                de: '<strong>Aufgabe 1:</strong><br>a) Definieren Sie die Begriffe Wert, Norm und Ziel.<br>b) Ordnen Sie die folgenden Begriffe den drei Kategorien zu: Klimaneutralität 2045, Menschenwürde, Verbot von Kinderarbeit, Gerechtigkeit, Reduktion der Biodiversitätsverluste um 50% bis 2030, Umweltschutz.<br><br><strong>Kreativaufgabe:</strong><br>Wählen Sie einen Wert (z.B. Freiheit oder Gerechtigkeit) und entwickeln Sie daraus eine Norm und ein konkretes Ziel für nachhaltige Entwicklung.',
+                                en: '<strong>Task 1:</strong><br>a) Define the terms value, norm, and goal.<br>b) Assign the following terms to the three categories: Climate neutrality 2045, human dignity, prohibition of child labor, justice, reduction of biodiversity loss by 50% by 2030, environmental protection.<br><br><strong>Creative Task:</strong><br>Choose a value (e.g., freedom or justice) and develop from it a norm and a concrete goal for sustainable development.'
+                            }
+                        }
+                    }
+                },
+                {
+                    id: 'institutionen',
+                    title: { de: 'Institutionen und Regelwerke', en: 'Institutions and Regulatory Frameworks' },
+                    cards: {
+                        worumgehts: {
+                            title: { de: 'Worum geht\'s', en: 'What is it about' },
+                            content: {
+                                de: 'Institutionen werden als "Spielregeln der Gesellschaft" definiert - formale (Gesetze, Verträge) und informelle (Normen, Konventionen) Regeln, die Verhalten strukturieren. Sie reduzieren Unsicherheit, ermöglichen Koordination und prägen ökonomische wie ökologische Entwicklung. Nachhaltige Transformation erfordert institutionellen Wandel, ist aber durch Pfadabhängigkeiten und Interessenkonflikte erschwert.',
+                                en: 'Institutions are defined as "rules of the game of society" - formal (laws, contracts) and informal (norms, conventions) rules that structure behavior. They reduce uncertainty, enable coordination, and shape economic and ecological development. Sustainable transformation requires institutional change but is complicated by path dependencies and conflicts of interest.'
+                            }
+                        },
+                        kerndefinitionen: {
+                            title: { de: 'Kerndefinitionen', en: 'Key Definitions' },
+                            content: {
+                                de: '<strong>Institutionen:</strong> Formale und informelle Regeln, die menschliches Verhalten strukturieren und koordinieren.<br><br><strong>Formale Institutionen:</strong> Geschriebene Regeln - Gesetze, Verträge, Verfassungen, Organisationsstrukturen.<br><br><strong>Informelle Institutionen:</strong> Ungeschriebene Regeln - Normen, Konventionen, Traditionen, kulturelle Praktiken.<br><br><strong>Institutioneller Wandel:</strong> Veränderung von Regelwerken - kann inkrementell oder disruptiv sein, ist oft pfadabhängig.<br><br><strong>Pfadabhängigkeit:</strong> Frühere institutionelle Entscheidungen schränken spätere Optionen ein (Lock-in-Effekte).',
+                                en: '<strong>Institutions:</strong> Formal and informal rules that structure and coordinate human behavior.<br><br><strong>Formal Institutions:</strong> Written rules - laws, contracts, constitutions, organizational structures.<br><br><strong>Informal Institutions:</strong> Unwritten rules - norms, conventions, traditions, cultural practices.<br><br><strong>Institutional Change:</strong> Modification of regulatory frameworks - can be incremental or disruptive, often path-dependent.<br><br><strong>Path Dependency:</strong> Previous institutional decisions constrain later options (lock-in effects).'
+                            }
+                        },
+                        reflexionsaufgaben: {
+                            title: { de: 'Reflexionsaufgaben', en: 'Reflection Questions' },
+                            content: {
+                                de: '<ol><li>Welche formalen und informellen Institutionen prägen dein Arbeitsfeld - und welche davon behindern nachhaltige Transformation?</li><li>Wo siehst du in deiner Region oder Organisation institutionelle Pfadabhängigkeiten, die Veränderung blockieren?</li><li>Welche konkreten institutionellen Innovationen (neue Regeln, Organisationsformen) könnten Nachhaltigkeit fördern?</li></ol>',
+                                en: '<ol><li>Which formal and informal institutions shape your field of work - and which of these hinder sustainable transformation?</li><li>Where do you see institutional path dependencies in your region or organization that block change?</li><li>What concrete institutional innovations (new rules, organizational forms) could promote sustainability?</li></ol>'
+                            }
+                        },
+                        ubungsaufgaben: {
+                            title: { de: 'Übungsaufgaben', en: 'Practice Exercises' },
+                            content: {
+                                de: '<strong>Aufgabe 1:</strong><br>a) Was sind Institutionen? Geben Sie eine Definition.<br>b) Unterscheiden Sie formale und informelle Institutionen und geben Sie je zwei Beispiele.<br>c) Erläutern Sie, warum Institutionen für nachhaltige Entwicklung wichtig sind.<br><br><strong>Kreativaufgabe:</strong><br>Wählen Sie ein Nachhaltigkeitsproblem (z.B. Plastikverschmutzung, Überfischung, Flächenversiegelung) und schlagen Sie sowohl formale als auch informelle institutionelle Lösungsansätze vor.',
+                                en: '<strong>Task 1:</strong><br>a) What are institutions? Provide a definition.<br>b) Distinguish formal and informal institutions and give two examples each.<br>c) Explain why institutions are important for sustainable development.<br><br><strong>Creative Task:</strong><br>Choose a sustainability problem (e.g., plastic pollution, overfishing, soil sealing) and propose both formal and informal institutional solution approaches.'
+                            }
+                        }
+                    }
+                },
+                {
+                    id: 'vielfalt',
+                    title: { de: 'Vielfalt und Resilienz', en: 'Diversity and Resilience' },
+                    cards: {
+                        worumgehts: {
+                            title: { de: 'Worum geht\'s', en: 'What is it about' },
+                            content: {
+                                de: 'Vielfalt (biologische, kulturelle, ökonomische Diversität) wird als Quelle von Anpassungsfähigkeit und Resilienz konzeptualisiert. Monokulturen - ökologisch wie ökonomisch - sind effizient unter stabilen Bedingungen, aber fragil gegenüber Störungen. Nachhaltige Systeme benötigen Redundanz und Diversität, auch wenn dies kurzfristige Effizienz kostet.',
+                                en: 'Diversity (biological, cultural, economic) is conceptualized as a source of adaptability and resilience. Monocultures - ecological and economic - are efficient under stable conditions but fragile to disturbances. Sustainable systems need redundancy and diversity, even if this costs short-term efficiency.'
+                            }
+                        },
+                        kerndefinitionen: {
+                            title: { de: 'Kerndefinitionen', en: 'Key Definitions' },
+                            content: {
+                                de: '<strong>Vielfalt/Diversität:</strong> Unterschiedlichkeit und Variabilität in Systemen - biologisch, kulturell, ökonomisch, institutionell.<br><br><strong>Resilienz:</strong> Fähigkeit eines Systems, Störungen zu absorbieren und sich zu erholen, ohne grundlegende Strukturen zu verlieren.<br><br><strong>Redundanz:</strong> Mehrfachvorhaltung von Funktionen und Strukturen - scheint ineffizient, erhöht aber Stabilität.<br><br><strong>Monokultur-Problem:</strong> Spezialisierung erhöht Effizienz unter stabilen Bedingungen, verringert aber Anpassungsfähigkeit bei Veränderung.<br><br><strong>Portfolio-Effekt:</strong> Diversifizierung verringert Gesamtrisiko - gilt für Biodiversität wie für Wirtschaftsstrukturen.',
+                                en: '<strong>Diversity:</strong> Differentiation and variability in systems - biological, cultural, economic, institutional.<br><br><strong>Resilience:</strong> A system\'s ability to absorb disturbances and recover without losing fundamental structures.<br><br><strong>Redundancy:</strong> Multiple provision of functions and structures - seems inefficient but increases stability.<br><br><strong>Monoculture Problem:</strong> Specialization increases efficiency under stable conditions but reduces adaptability to change.<br><br><strong>Portfolio Effect:</strong> Diversification reduces overall risk - applies to biodiversity as well as economic structures.'
+                            }
+                        },
+                        reflexionsaufgaben: {
+                            title: { de: 'Reflexionsaufgaben', en: 'Reflection Questions' },
+                            content: {
+                                de: '<ol><li>Wo in deinem Arbeitskontext dominiert Effizienzdenken (Monokultur-Logik) auf Kosten von Diversität und Resilienz?</li><li>Welche Formen von Redundanz und Vielfalt könnten die Widerstandsfähigkeit deiner Organisation oder Region erhöhen?</li><li>Wie würdest du das Spannungsfeld zwischen kurzfristiger Effizienz und langfristiger Resilienz in aktuellen Projekten navigieren?</li></ol>',
+                                en: '<ol><li>Where in your work context does efficiency thinking (monoculture logic) dominate at the expense of diversity and resilience?</li><li>What forms of redundancy and diversity could increase the resilience of your organization or region?</li><li>How would you navigate the tension between short-term efficiency and long-term resilience in current projects?</li></ol>'
+                            }
+                        },
+                        ubungsaufgaben: {
+                            title: { de: 'Übungsaufgaben', en: 'Practice Exercises' },
+                            content: {
+                                de: '<strong>Aufgabe 1:</strong><br>a) Definieren Sie die Begriffe Vielfalt und Resilienz.<br>b) Erläutern Sie den Zusammenhang zwischen Vielfalt und Resilienz anhand eines Beispiels.<br>c) Warum können Monokulturen problematisch sein? Nennen Sie ein ökologisches und ein ökonomisches Beispiel.<br><br><strong>Kreativaufgabe:</strong><br>Eine Region ist stark von einer einzigen Industrie abhängig (z.B. Automobilindustrie, Tourismus). Entwickeln Sie Strategien, wie diese Region ihre wirtschaftliche Vielfalt und damit Resilienz erhöhen könnte.',
+                                en: '<strong>Task 1:</strong><br>a) Define the terms diversity and resilience.<br>b) Explain the relationship between diversity and resilience using an example.<br>c) Why can monocultures be problematic? Name an ecological and an economic example.<br><br><strong>Creative Task:</strong><br>A region is heavily dependent on a single industry (e.g., automotive industry, tourism). Develop strategies for how this region could increase its economic diversity and thus resilience.'
+                            }
+                        }
+                            content: {
+                                de: '<strong>Aufgabe 1:</strong><br>a) Warum ist ein Nachdenken über Gerechtigkeit notwendig, um zu bestimmen, worum es bei nachhaltiger Entwicklung geht?<br>b) Konstruieren Sie ein Beispiel, um zu zeigen, dass Verteilungsgerechtigkeit nicht ausreichend ist.<br>c) Erläutern Sie anhand eines Beispiels intragenerationale und intergenerationale Gerechtigkeit.<br><br><strong>Kreativaufgabe:</strong><br>Angenommen, unser Planet würde uns unbegrenzt mit Rohstoffen versorgen und hätte unbegrenzte Aufnahmekapazitäten für Schadstoffe. Besteht die Möglichkeit, dass die wirtschaftliche Entwicklung auf diesem Planeten trotzdem nicht nachhaltig ist?',
+                                en: '<strong>Task 1:</strong><br>a) Why is thinking about justice necessary to determine what sustainable development is about?<br>b) Construct an example to show that distributive justice is not sufficient.<br>c) Explain intragenerational and intergenerational justice using an example.<br><br><strong>Creative Task:</strong><br>Assuming our planet would provide us with unlimited resources and have unlimited capacity for pollutants. Is it possible that economic development on this planet would still not be sustainable?'
+                            }
+                        }
+                    }
+                },
+                {
+                    id: 'irreversibilitaet',
+                    title: { de: 'Irreversibilität', en: 'Irreversibility' },
+                    cards: {
+                        worumgehts: {
+                            title: { de: 'Worum geht\'s', en: 'What is it about' },
+                            content: {
+                                de: 'Thermodynamik wird als physikalische Grundlage von Umweltproblemen eingeführt. Der erste Hauptsatz beschreibt Energie- und Massenerhaltung, der zweite die Zunahme der Entropie und damit die qualitative Entwertung von Energie und Stoffen. Daraus folgen Grenzen des Wirkungsgrads und die Einsicht, dass moderne Wirtschaft stets Entropie produziert.',
+                                en: 'Thermodynamics is introduced as the physical foundation of environmental problems. The first law describes energy and mass conservation, the second the increase of entropy and thus the qualitative degradation of energy and materials. This implies limits to efficiency and the insight that modern economy always produces entropy.'
+                            }
+                        },
+                        kerndefinitionen: {
+                            title: { de: 'Kerndefinitionen', en: 'Key Definitions' },
+                            content: {
+                                de: '<strong>1. Hauptsatz der Thermodynamik:</strong> Energie bleibt in einem geschlossenen System konstant - sie kann weder erzeugt noch vernichtet werden.<br><br><strong>2. Hauptsatz der Thermodynamik:</strong> Die Entropie (Unordnung) in einem geschlossenen System nimmt stets zu.<br><br><strong>Entropie:</strong> Maß für die qualitative Entwertung von Energie und Stoffen - nutzbare Energie wird zu Abwärme.',
+                                en: '<strong>First Law of Thermodynamics:</strong> Energy remains constant in a closed system - it can neither be created nor destroyed.<br><br><strong>Second Law of Thermodynamics:</strong> Entropy (disorder) always increases in a closed system.<br><br><strong>Entropy:</strong> Measure of the qualitative degradation of energy and materials - usable energy becomes waste heat.'
+                            }
+                        },
+                        reflexionsaufgaben: {
+                            title: { de: 'Reflexionsaufgaben', en: 'Reflection Questions' },
+                            content: {
+                                de: '<ol><li>Wie würde sich deine Einschätzung technischer „Lösungen" ändern, wenn du Entropie und Wirkungsgrad konsequent mitbedenkst?</li><li>Welche politischen oder ökonomischen Versprechen erscheinen dir aus thermodynamischer Sicht besonders fragwürdig?</li><li>Wo wäre es in deiner Lehre oder Beratung sinnvoll, thermodynamische Grundideen einzuführen, um Umweltprobleme besser zu rahmen?</li></ol>',
+                                en: '<ol><li>How would your assessment of technical "solutions" change if you consistently considered entropy and efficiency?</li><li>Which political or economic promises seem particularly questionable from a thermodynamic perspective?</li><li>Where would it make sense in your teaching or consulting to introduce thermodynamic basic ideas to better frame environmental problems?</li></ol>'
+                            }
+                        },
+                        ubungsaufgaben: {
+                            title: { de: 'Übungsaufgaben', en: 'Practice Exercises' },
+                            content: {
+                                de: '<strong>Aufgabe 1:</strong><br>1. Martin fährt mit dem Fahrrad und bremst. Welche Energieformen sind damit verbunden?<br>2. Sandra pumpt einen Fahrradreifen auf. Welche Energieformen sind damit verbunden?<br><br><strong>Kreativaufgabe:</strong><br>Erläutern Sie, inwiefern die beiden Hauptsätze der Thermodynamik eine wesentliche Bedeutung für das Klimaproblem haben.',
+                                en: '<strong>Task 1:</strong><br>1. Martin rides a bicycle and brakes. What forms of energy are involved?<br>2. Sandra pumps up a bicycle tire. What forms of energy are involved?<br><br><strong>Creative Task:</strong><br>Explain how the two laws of thermodynamics are essential for understanding the climate problem.'
+                            }
+                        }
+                    }
+                },
+                {
+                    id: 'unwissen',
+                    title: { de: 'Unwissen', en: 'Ignorance' },
+                    cards: {
+                        worumgehts: {
+                            title: { de: 'Worum geht\'s', en: 'What is it about' },
+                            content: {
+                                de: 'Das Kapitel zeigt, dass viele natürliche und wirtschaftliche Prozesse irreversibel sind, weil Entropie entsteht. Es unterscheidet thermodynamische und ökonomische Irreversibilität (Lock-in-Effekte) und diskutiert, wie pfadabhängige Investitionen zukünftige Optionen blockieren können.',
+                                en: 'The chapter shows that many natural and economic processes are irreversible because entropy is created. It distinguishes thermodynamic and economic irreversibility (lock-in effects) and discusses how path-dependent investments can block future options.'
+                            }
+                        },
+                        kerndefinitionen: {
+                            title: { de: 'Kerndefinitionen', en: 'Key Definitions' },
+                            content: {
+                                de: '<strong>Thermodynamische Irreversibilität:</strong> Prozesse, die physikalisch nicht umkehrbar sind (z.B. Brausetablette in Wasser).<br><br><strong>Ökonomische Irreversibilität:</strong> Lock-in-Effekte durch Investitionen in Infrastruktur und Technologie.<br><br><strong>Pfadabhängigkeit:</strong> Frühere Entscheidungen schränken zukünftige Optionen ein.',
+                                en: '<strong>Thermodynamic Irreversibility:</strong> Processes that are physically non-reversible (e.g., effervescent tablet in water).<br><br><strong>Economic Irreversibility:</strong> Lock-in effects from investments in infrastructure and technology.<br><br><strong>Path Dependency:</strong> Previous decisions constrain future options.'
+                            }
+                        },
+                        reflexionsaufgaben: {
+                            title: { de: 'Reflexionsaufgaben', en: 'Reflection Questions' },
+                            content: {
+                                de: '<ol><li>Welche deiner Projekte weisen Investitions- oder Infrastruktur-Entscheidungen auf, die Lock-in-Risiken bergen?</li><li>Wie würdest du deine Entscheidungsverfahren verändern, wenn du Irreversibilität als explizites Bewertungskriterium einführst?</li><li>Wo akzeptierst du bewusst irreversible Schritte - und warum?</li></ol>',
+                                en: '<ol><li>Which of your projects have investment or infrastructure decisions that carry lock-in risks?</li><li>How would you change your decision-making procedures if you introduced irreversibility as an explicit evaluation criterion?</li><li>Where do you consciously accept irreversible steps - and why?</li></ol>'
+                            }
+                        },
+                        ubungsaufgaben: {
+                            title: { de: 'Übungsaufgaben', en: 'Practice Exercises' },
+                            content: {
+                                de: 'Schätzen Sie ein, ob die folgenden Prozesse irreversibel oder reversibel sind:<br>a) Bungeesprung von einer Brücke<br>b) Die Bewegung der Erde um die Sonne innerhalb eines halben Jahres<br>c) Der Verlust der Blätter eines Baumes im Winter<br>d) Die Entstehung von radioaktivem Müll durch ein AKW<br>e) Die Emission von Treibhausgasen durch ein Kohlekraftwerk',
+                                en: 'Assess whether the following processes are irreversible or reversible:<br>a) Bungee jump from a bridge<br>b) The movement of Earth around the sun within half a year<br>c) The loss of leaves from a tree in winter<br>d) The creation of radioactive waste from a nuclear power plant<br>e) The emission of greenhouse gases from a coal plant'
+                            }
+                        }
+                    }
+                }
+            ],
+            time: [
+                {
+                    id: 'zeit',
+                    title: { de: 'Zeit', en: 'Time' },
+                    cards: {
+                        worumgehts: {
+                            title: { de: 'Worum geht\'s', en: 'What is it about' },
+                            content: {
+                                de: 'Evolution wird weit gefasst als Prozess der Veränderung von Etwas im Laufe der Zeit und mithilfe von Genotyp (Möglichkeiten) und Phänotyp (Realisierungen) für Biologie, Physik und Wirtschaft rekonstruiert. Während physikalische und biologische Genotypen stabil bzw. langsam mutieren, verändert sich der ökonomische Genotyp schnell.',
+                                en: 'Evolution is broadly defined as a process of change over time and reconstructed using genotype (possibilities) and phenotype (realizations) for biology, physics, and economics. While physical and biological genotypes are stable or mutate slowly, the economic genotype changes rapidly.'
+                            }
+                        },
+                        kerndefinitionen: {
+                            title: { de: 'Kerndefinitionen', en: 'Key Definitions' },
+                            content: {
+                                de: '<strong>Genotyp:</strong> Die Möglichkeiten eines Systems (Ressourcenbasis, Technik, Institutionen, Präferenzen).<br><br><strong>Phänotyp:</strong> Die Realisierungen eines Systems - was tatsächlich geschieht.<br><br><strong>Evolutorische Dynamik:</strong> Veränderungsprozesse mit unterschiedlichen Geschwindigkeiten in Biologie, Physik und Ökonomie.',
+                                en: '<strong>Genotype:</strong> The possibilities of a system (resource base, technology, institutions, preferences).<br><br><strong>Phenotype:</strong> The realizations of a system - what actually happens.<br><br><strong>Evolutionary Dynamics:</strong> Change processes with different speeds in biology, physics, and economics.'
+                            }
+                        },
+                        reflexionsaufgaben: {
+                            title: { de: 'Reflexionsaufgaben', en: 'Reflection Questions' },
+                            content: {
+                                de: '<ol><li>Welche Elemente des „Genotyps" deiner Organisation oder Region würdest du als relativ stabil, welche als hochdynamisch beschreiben?</li><li>Wo verlässt du dich in deinem Feld auf Gleichgewichtsmodelle - und sind diese angesichts evolutorischer Prozesse noch tragfähig?</li><li>Welche Rolle spielen historische „Dreiecke der Verursachung" (Erfindung-Innovation-Umweltwirkung) in deinem Themenfeld?</li></ol>',
+                                en: '<ol><li>Which elements of your organization\'s or region\'s "genotype" would you describe as relatively stable, which as highly dynamic?</li><li>Where do you rely on equilibrium models in your field - and are these still viable given evolutionary processes?</li><li>What role do historical "triangles of causation" (invention-innovation-environmental impact) play in your subject area?</li></ol>'
+                            }
+                        },
+                        ubungsaufgaben: {
+                            title: { de: 'Übungsaufgaben', en: 'Practice Exercises' },
+                            content: {
+                                de: '<strong>Aufgabe 1:</strong><br>a) Geben Sie je ein Beispiel für einen Genotyp und Phänotyp in der Biologie, Physik und Ökonomie.<br>b) Wie viele Genotypen gibt es in der Biologie, der Physik und der Ökonomie?<br>c) Erläutern Sie, ob ein Phänotyp seinen Genotyp beeinflussen kann.<br><br><strong>Kreativaufgabe:</strong><br>Diskutieren Sie, wie der Genotyp eines ökologischen Systems formuliert werden könnte.',
+                                en: '<strong>Task 1:</strong><br>a) Provide an example each of genotype and phenotype in biology, physics, and economics.<br>b) How many genotypes exist in biology, physics, and economics?<br>c) Explain whether a phenotype can influence its genotype.<br><br><strong>Creative Task:</strong><br>Discuss how the genotype of an ecological system could be formulated.'
+                            }
+                        }
+                    }
+                },
+                {
+                    id: 'evolution',
+                    title: { de: 'Evolution', en: 'Evolution' },
+                    cards: {
+                        worumgehts: {
+                            title: { de: 'Worum geht\'s', en: 'What is it about' },
+                            content: {
+                                de: 'Unwissen wird systematisch unterschieden in individuelles vs. kollektives, reduzierbares vs. nicht-reduzierbares, offenes vs. geschlossenes Unwissen sowie gegenüber Risiko und Unsicherheit. An Beispielen wird gezeigt, wie Neuheit und Komplexität Planbarkeit begrenzen und warum wir unser Wissen systematisch überschätzen.',
+                                en: 'Ignorance is systematically distinguished into individual vs. collective, reducible vs. non-reducible, open vs. closed ignorance, as well as in relation to risk and uncertainty. Examples show how novelty and complexity limit planability and why we systematically overestimate our knowledge.'
+                            }
+                        },
+                        kerndefinitionen: {
+                            title: { de: 'Kerndefinitionen', en: 'Key Definitions' },
+                            content: {
+                                de: '<strong>Offenes Unwissen:</strong> Wir wissen, dass wir etwas nicht wissen.<br><br><strong>Geschlossenes Unwissen:</strong> Wir wissen nicht, dass wir etwas nicht wissen.<br><br><strong>Reduzierbares Unwissen:</strong> Kann durch Forschung verringert werden.<br><br><strong>Nicht-reduzierbares Unwissen:</strong> Prinzipiell nicht auflösbar (z.B. zukünftige Innovationen).',
+                                en: '<strong>Open Ignorance:</strong> We know that we don\'t know something.<br><br><strong>Closed Ignorance:</strong> We don\'t know that we don\'t know something.<br><br><strong>Reducible Ignorance:</strong> Can be reduced through research.<br><br><strong>Non-reducible Ignorance:</strong> Fundamentally irresolvable (e.g., future innovations).'
+                            }
+                        },
+                        reflexionsaufgaben: {
+                            title: { de: 'Reflexionsaufgaben', en: 'Reflection Questions' },
+                            content: {
+                                de: '<ol><li>Welche wesentlichen Unterscheidungen (Risiko/Unsicherheit/Unwissen; offen/geschlossen) sind in deinen Projekten bisher unterbelichtet?</li><li>Wo würdest du heute sagen, dass du vor einigen Jahren „geschlossen unwissend" warst - mit welchen Folgen?</li><li>Welche konkreten Schritte könntest du setzen, um offenes Unwissen in deinem Team explizit zu machen?</li></ol>',
+                                en: '<ol><li>Which essential distinctions (risk/uncertainty/ignorance; open/closed) have been underexposed in your projects so far?</li><li>Where would you say today that you were "closed ignorant" a few years ago - with what consequences?</li><li>What concrete steps could you take to make open ignorance explicit in your team?</li></ol>'
+                            }
+                        },
+                        ubungsaufgaben: {
+                            title: { de: 'Übungsaufgaben', en: 'Practice Exercises' },
+                            content: {
+                                de: 'Handelt es sich bei den folgenden Beispielen um Unwissen? Wenn ja, wer ist unwissend und handelt es sich um reduzierbares oder nicht reduzierbares Unwissen?<br><br>- Nach wochenlanger Hitze und Trockenheit ist der Rhein aufgrund von Niedrigwasser nicht mehr befahrbar<br>- Eine Studie stellt fest, dass die Präferenz für Grünstromtarife zurückgeht, wenn ein Windrad in unmittelbarer Nähe aufgestellt wird<br>- Die Nutzung von FCKWs als Kühlmittel verursacht den Abbau der Ozonschicht',
+                                en: 'Are the following examples cases of ignorance? If yes, who is ignorant and is it reducible or non-reducible ignorance?<br><br>- After weeks of heat and drought, the Rhine is no longer navigable due to low water<br>- A study finds that preference for green electricity tariffs declines when a wind turbine is installed nearby<br>- The use of CFCs as refrigerants causes ozone layer depletion'
+                            }
+                        }
+                    }
+                },
+                {
+                    id: 'kuppelproduktion',
+                    title: { de: 'Kuppelproduktion', en: 'Joint Production' },
+                    cards: {
+                        worumgehts: {
+                            title: { de: 'Worum geht\'s', en: 'What is it about' },
+                            content: {
+                                de: 'Kuppelproduktion bezeichnet, dass jeder Produktionsprozess - thermodynamisch notwendig - neben intendierten Outputs unerwünschte Kuppelprodukte (Abfälle, Emissionen) erzeugt. Damit werden Umweltprobleme nicht als „externe Effekte" im Nachhinein, sondern als inhärenter Bestandteil von Produktion im Vorhinein sichtbar.',
+                                en: 'Joint production means that every production process - thermodynamically necessary - produces unwanted by-products (waste, emissions) alongside intended outputs. This makes environmental problems visible not as "external effects" in retrospect, but as inherent components of production in advance.'
+                            }
+                        },
+                        kerndefinitionen: {
+                            title: { de: 'Kerndefinitionen', en: 'Key Definitions' },
+                            content: {
+                                de: '<strong>Kuppelproduktion:</strong> Gleichzeitige Erzeugung mehrerer Produkte in einem Prozess - gewollt und ungewollt.<br><br><strong>Gewollte Kuppelprodukte:</strong> Z.B. Schafmilch und Wolle.<br><br><strong>Ungewollte Kuppelprodukte:</strong> Abfälle, Emissionen, Schadstoffe - thermodynamisch unvermeidbar.',
+                                en: '<strong>Joint Production:</strong> Simultaneous generation of multiple products in one process - intended and unintended.<br><br><strong>Intended By-products:</strong> E.g., sheep milk and wool.<br><br><strong>Unintended By-products:</strong> Waste, emissions, pollutants - thermodynamically unavoidable.'
+                            }
+                        },
+                        reflexionsaufgaben: {
+                            title: { de: 'Reflexionsaufgaben', en: 'Reflection Questions' },
+                            content: {
+                                de: '<ol><li>Wie verändert sich deine Sicht auf „Verursacher" von Umweltproblemen, wenn du Kuppelproduktion statt externer Effekte in den Vordergrund stellst?</li><li>Wo in deinen Projekten wäre es hilfreich, Kuppelprodukte bereits in der Designphase mitzudenken?</li><li>Welche Kuppelproduktionen in ökologischen Systemen sollten in deinen Analysen stärker berücksichtigt werden?</li></ol>',
+                                en: '<ol><li>How does your view of "polluters" change when you prioritize joint production instead of external effects?</li><li>Where in your projects would it be helpful to consider by-products already in the design phase?</li><li>Which joint productions in ecological systems should be more strongly considered in your analyses?</li></ol>'
+                            }
+                        },
+                        ubungsaufgaben: {
+                            title: { de: 'Übungsaufgaben', en: 'Practice Exercises' },
+                            content: {
+                                de: '<strong>Aufgabe:</strong><br>a) Definieren Sie den Begriff der Kuppelproduktion.<br>b) Ist es möglich, etwas zu produzieren, ohne gleichzeitig etwas Anderes zu bewirken?<br>c) Geben Sie ein Beispiel eines unerwünschten Kuppelproduktes.<br><br><strong>Kreativaufgabe:</strong><br>Das Ozonloch wurde durch FCKWs verursacht. Erläutern Sie, warum das Auftreten des Ozonloches auf das Phänomen der Kuppelproduktion zurückzuführen ist.',
+                                en: '<strong>Task:</strong><br>a) Define the concept of joint production.<br>b) Is it possible to produce something without simultaneously causing something else?<br>c) Provide an example of an unwanted by-product.<br><br><strong>Creative Task:</strong><br>The ozone hole was caused by CFCs. Explain why the occurrence of the ozone hole can be attributed to the phenomenon of joint production.'
+                            }
+                        }
+                    }
+                },
+                {
+                    id: 'knappheit',
+                    title: { de: 'Absolute und relative Knappheit', en: 'Absolute and Relative Scarcity' },
+                    cards: {
+                        worumgehts: {
+                            title: { de: 'Worum geht\'s', en: 'What is it about' },
+                            content: {
+                                de: 'Das Kapitel unterscheidet relative Knappheit (Güter sind substituierbar, Wahlfreiheit besteht) und absolute Knappheit (Güter sind nicht substituierbar, etwa Wasser in der Wüste oder kritische Ökosystemleistungen). Es diskutiert das verbleibende globale CO₂-Budget als ambivalenten Fall.',
+                                en: 'The chapter distinguishes relative scarcity (goods are substitutable, choice exists) and absolute scarcity (goods are non-substitutable, such as water in the desert or critical ecosystem services). It discusses the remaining global CO₂ budget as an ambivalent case.'
+                            }
+                        },
+                        kerndefinitionen: {
+                            title: { de: 'Kerndefinitionen', en: 'Key Definitions' },
+                            content: {
+                                de: '<strong>Relative Knappheit:</strong> Güter sind durch andere ersetzbar - Preis regelt Allokation.<br><br><strong>Absolute Knappheit:</strong> Güter sind nicht substituierbar - existenzielle Grenzen.<br><br><strong>CO₂-Budget:</strong> Ambivalent - teils relativ (Emissionshandel), teils absolut (Erderwärmungsgrenzen).',
+                                en: '<strong>Relative Scarcity:</strong> Goods can be replaced by others - price regulates allocation.<br><br><strong>Absolute Scarcity:</strong> Goods cannot be substituted - existential limits.<br><br><strong>CO₂ Budget:</strong> Ambivalent - partly relative (emissions trading), partly absolute (global warming limits).'
+                            }
+                        },
+                        reflexionsaufgaben: {
+                            title: { de: 'Reflexionsaufgaben', en: 'Reflection Questions' },
+                            content: {
+                                de: '<ol><li>Welche Ressourcen oder Umweltgüter in deinem Feld würdest du als absolut, welche als relativ knapp einstufen - und warum?</li><li>Wie beeinflusst deine Knappheitsdeutung (absolut/relativ) deine Beurteilung von Marktinstrumenten wie CO₂-Bepreisung?</li><li>Wo müsste aus deiner Sicht eine gesellschaftliche Debatte über existenzielle vs. imaginäre Bedürfnisse geführt werden?</li></ol>',
+                                en: '<ol><li>Which resources or environmental goods in your field would you classify as absolutely scarce, which as relatively scarce - and why?</li><li>How does your interpretation of scarcity (absolute/relative) influence your assessment of market instruments like CO₂ pricing?</li><li>Where should a societal debate about existential vs. imaginary needs take place from your perspective?</li></ol>'
+                            }
+                        },
+                        ubungsaufgaben: {
+                            title: { de: 'Übungsaufgaben', en: 'Practice Exercises' },
+                            content: {
+                                de: 'Welche Art von Knappheit trifft auf die folgenden Güter zu, relative oder absolute? Argumentieren Sie.<br><br>a) WG-Zimmer in München<br>b) Intensiv-Bett während einer Pandemie<br>c) CO₂-Zertifikate im EU-Emissionshandel<br>d) Trinkwasser nach einem Vulkanausbruch<br><br><strong>Kreativaufgabe:</strong><br>Konstruieren Sie einen Fall, in dem ein Gut sowohl absolut als auch relativ knapp ist.',
+                                en: 'What type of scarcity applies to the following goods, relative or absolute? Argue your position.<br><br>a) Shared apartment room in Munich<br>b) Intensive care bed during a pandemic<br>c) CO₂ certificates in EU emissions trading<br>d) Drinking water after a volcanic eruption<br><br><strong>Creative Task:</strong><br>Construct a case where a good is both absolutely and relatively scarce.'
+                            }
+                        }
+                    }
+                }
+            ],
+            humanity: [
+                {
+                    id: 'menschenbilder',
+                    title: { de: 'Menschenbilder: Homo Oeconomicus und Homo Politicus', en: 'Human Images: Homo Oeconomicus and Homo Politicus' },
+                    cards: {
+                        worumgehts: {
+                            title: { de: 'Worum geht\'s', en: 'What is it about' },
+                            content: {
+                                de: 'Das Kapitel entwickelt zwei komplementäre Menschenbilder: Der Homo Oeconomicus (H.O.) maximiert Nutzen unter Knappheitsbedingungen mit gegebenen Präferenzen und Technologien. Der Homo Politicus (H.P.) gestaltet hingegen Institutionen, handelt in offenen Situationen und bildet normative Urteile über das gute Leben. Beide Konzepte sind analytische Idealtypen, die unterschiedliche Handlungsdimensionen beleuchten.',
+                                en: 'The chapter develops two complementary human images: Homo Oeconomicus (H.O.) maximizes utility under scarcity conditions with given preferences and technologies. Homo Politicus (H.P.) shapes institutions, acts in open situations, and forms normative judgments about the good life. Both concepts are analytical ideal types that illuminate different dimensions of action.'
+                            }
+                        },
+                        kerndefinitionen: {
+                            title: { de: 'Kerndefinitionen', en: 'Key Definitions' },
+                            content: {
+                                de: '<strong>Homo Oeconomicus (H.O.):</strong> Handelt rational und nutzenmaximierend unter Knappheitsbedingungen. Präferenzen und Produktionsmöglichkeiten sind gegeben. Bezieht sich auf ökonomische Entscheidungen bei relativer Knappheit.<br><br><strong>Homo Politicus (H.P.):</strong> Gestaltet Institutionen, trifft normative Urteile, handelt in offenen Situationen. Präferenzen und Werte werden gebildet, nicht vorgegeben. Bezieht sich auf politische Gestaltung und absolute Knappheit.<br><br><strong>Komplementarität:</strong> Beide Menschenbilder ergänzen sich - H.O. für Allokation unter Restriktionen, H.P. für Gestaltung von Restriktionen und Werten.',
+                                en: '<strong>Homo Oeconomicus (H.O.):</strong> Acts rationally and utility-maximizing under scarcity conditions. Preferences and production possibilities are given. Refers to economic decisions under relative scarcity.<br><br><strong>Homo Politicus (H.P.):</strong> Shapes institutions, makes normative judgments, acts in open situations. Preferences and values are formed, not predetermined. Refers to political design and absolute scarcity.<br><br><strong>Complementarity:</strong> Both human images complement each other - H.O. for allocation under constraints, H.P. for shaping constraints and values.'
+                            }
+                        },
+                        reflexionsaufgaben: {
+                            title: { de: 'Reflexionsaufgaben', en: 'Reflection Questions' },
+                            content: {
+                                de: '<ol><li>In welchen deiner Arbeitsfelder dominiert das H.O.-Denken (Optimierung unter Restriktionen), wo das H.P.-Denken (Gestaltung von Restriktionen)? Wo wäre mehr Balance nötig?</li><li>Welche deiner eigenen Präferenzen und Werte hast du als gegeben behandelt (H.O.), obwohl sie eigentlich gestaltbar sind (H.P.)?</li><li>Wie würdest du in einem aktuellen Projekt zwischen relativer Knappheit (H.O.-Domäne) und absoluter Knappheit (H.P.-Domäne) unterscheiden?</li></ol>',
+                                en: '<ol><li>In which of your work areas does H.O. thinking (optimization under constraints) dominate, where H.P. thinking (shaping constraints)? Where would more balance be needed?</li><li>Which of your own preferences and values have you treated as given (H.O.), although they are actually shapeable (H.P.)?</li><li>How would you distinguish between relative scarcity (H.O. domain) and absolute scarcity (H.P. domain) in a current project?</li></ol>'
+                            }
+                        },
+                        ubungsaufgaben: {
+                            title: { de: 'Übungsaufgaben', en: 'Practice Exercises' },
+                            content: {
+                                de: '<strong>Aufgabe 1:</strong><br>a) Definieren Sie die Begriffe „Homo Oeconomicus" und „Homo Politicus".<br>b) Erläutern Sie anhand von Beispielen, warum beide Menschenbilder für die Analyse nachhaltiger Entwicklung notwendig sind.<br>c) Diskutieren Sie: Kann eine Person gleichzeitig als H.O. und H.P. handeln?<br><br><strong>Kreativaufgabe:</strong><br>Analysieren Sie eine aktuelle umweltpolitische Debatte (z.B. CO₂-Bepreisung, Tempolimit, Kreislaufwirtschaft). Identifizieren Sie Argumentationsmuster, die dem H.O. zugeordnet werden können, und solche, die dem H.P. entsprechen. Welches Menschenbild dominiert die Debatte?',
+                                en: '<strong>Task 1:</strong><br>a) Define the terms "Homo Oeconomicus" and "Homo Politicus".<br>b) Explain with examples why both human images are necessary for analyzing sustainable development.<br>c) Discuss: Can a person act as H.O. and H.P. simultaneously?<br><br><strong>Creative Task:</strong><br>Analyze a current environmental policy debate (e.g., CO₂ pricing, speed limits, circular economy). Identify argumentation patterns that can be attributed to H.O. and those that correspond to H.P. Which human image dominates the debate?'
+                            }
+                        }
+                    }
+                }
+                },
+                {
+                    id: 'bestaende',
+                    title: { de: 'Bestände', en: 'Stocks' },
+                    cards: {
+                        worumgehts: {
+                            title: { de: 'Worum geht\'s', en: 'What is it about' },
+                            content: {
+                                de: 'Bestände werden als materielle und immaterielle Vorräte (Ressourcen, Infrastruktur, Wissen, Institutionen, Verhaltensmuster) verstanden, deren Veränderung über die Zeit analysiert werden muss. Nachhaltige Transformation heißt, lebenswichtige Bestände zu erhalten und schädliche Bestände abzubauen.',
+                                en: 'Stocks are understood as material and immaterial reserves (resources, infrastructure, knowledge, institutions, behavioral patterns) whose changes over time must be analyzed. Sustainable transformation means maintaining vital stocks and reducing harmful stocks.'
+                            }
+                        },
+                        kerndefinitionen: {
+                            title: { de: 'Kerndefinitionen', en: 'Key Definitions' },
+                            content: {
+                                de: '<strong>Materielle Bestände:</strong> Physische Vorräte wie Ressourcen, Infrastruktur, CO₂ in der Atmosphäre.<br><br><strong>Immaterielle Bestände:</strong> Wissen, Institutionen, Verhaltensmuster, soziale Strukturen.<br><br><strong>Bestandsveränderung:</strong> Auf- und Abbau von Beständen mit spezifischen Eigenzeiten und Trägheiten.',
+                                en: '<strong>Material Stocks:</strong> Physical reserves like resources, infrastructure, CO₂ in the atmosphere.<br><br><strong>Immaterial Stocks:</strong> Knowledge, institutions, behavioral patterns, social structures.<br><br><strong>Stock Changes:</strong> Building up and breaking down stocks with specific inherent times and inertia.'
+                            }
+                        },
+                        reflexionsaufgaben: {
+                            title: { de: 'Reflexionsaufgaben', en: 'Reflection Questions' },
+                            content: {
+                                de: '<ol><li>Welche materiellen und immateriellen Bestände strukturieren dein Handlungsfeld - und mit welchen Eigenzeiten?</li><li>Wo unterschätzt du möglicherweise die Trägheit bestimmter Bestände in deiner Planung?</li><li>Welche Bestände müsstest du heute in Bewegung setzen, damit gewünschte Wirkungen in 20-30 Jahren realistisch sind?</li></ol>',
+                                en: '<ol><li>Which material and immaterial stocks structure your field of action - and with what inherent times?</li><li>Where might you underestimate the inertia of certain stocks in your planning?</li><li>Which stocks would you need to set in motion today for desired effects to be realistic in 20-30 years?</li></ol>'
+                            }
+                        },
+                        ubungsaufgaben: {
+                            title: { de: 'Übungsaufgaben', en: 'Practice Exercises' },
+                            content: {
+                                de: '<strong>Aufgabe 1:</strong><br>a) Unterscheiden Sie zwischen materiellen und immateriellen Beständen. Geben Sie je zwei Beispiele.<br>b) Erläutern Sie, warum die Veränderung von Beständen unterschiedliche Eigenzeiten aufweist.<br>c) Diskutieren Sie anhand des Beispiels CO₂ in der Atmosphäre: Handelt es sich um einen aufzubauenden oder abzubauenden Bestand?<br><br><strong>Kreativaufgabe:</strong><br>Wählen Sie einen gesellschaftlichen Transformationsprozess (z.B. Energiewende, Mobilitätswende, Ernährungswende). Identifizieren Sie drei zentrale Bestände (mindestens einen materiellen und einen immateriellen), die für diese Transformation relevant sind. Schätzen Sie deren Eigenzeiten ab und diskutieren Sie Hebelpunkte für beschleunigte Veränderung.',
+                                en: '<strong>Task 1:</strong><br>a) Distinguish between material and immaterial stocks. Provide two examples each.<br>b) Explain why changes in stocks have different inherent times.<br>c) Discuss using the example of CO₂ in the atmosphere: Is this a stock to be built up or reduced?<br><br><strong>Creative Task:</strong><br>Choose a societal transformation process (e.g., energy transition, mobility transition, food transition). Identify three central stocks (at least one material and one immaterial) that are relevant for this transformation. Estimate their inherent times and discuss leverage points for accelerated change.'
+                            }
+                        }
+                    }
+                } Abbau von Beständen mit spezifischen Eigenzeiten und Trägheiten.',
+                                en: '<strong>Material Stocks:</strong> Physical reserves like resources, infrastructure, CO₂ in the atmosphere.<br><br><strong>Immaterial Stocks:</strong> Knowledge, institutions, behavioral patterns, social structures.<br><br><strong>Stock Changes:</strong> Building up and breaking down stocks with specific inherent times and inertia.'
+                            }
+                        },
+                        reflexionsaufgaben: {
+                            title: { de: 'Reflexionsaufgaben', en: 'Reflection Questions' },
+                            content: {
+                                de: '<ol><li>Welche materiellen und immateriellen Bestände strukturieren dein Handlungsfeld - und mit welchen Eigenzeiten?</li><li>Wo unterschätzt du möglicherweise die Trägheit bestimmter Bestände in deiner Planung?</li><li>Welche Bestände müsstest du heute in Bewegung setzen, damit gewünschte Wirkungen in 20-30 Jahren realistisch sind?</li></ol>',
+                                en: '<ol><li>Which material and immaterial stocks structure your field of action - and with what inherent times?</li><li>Where might you underestimate the inertia of certain stocks in your planning?</li><li>Which stocks would you need to set in motion today for desired effects to be realistic in 20-30 years?</li></ol>'
+                            }
+                        },
+                        ubungsaufgaben: {
+                            title: { de: 'Übungsaufgaben', en: 'Practice Exercises' },
+                            content: {
+                                de: '<em>Übungsaufgaben werden noch ergänzt. Dieser Bereich ist editierbar und kann jederzeit mit konkreten Aufgaben gefüllt werden.</em>',
+                                en: '<em>Practice exercises will be added later. This area is editable and can be filled with specific tasks at any time.</em>'
+                            }
+                        }
+                    }
+                }
+            ],
+            humanity: [
+                {
+                    id: 'nachhaltigkeit-gerechtigkeit',
+                    title: { de: 'Nachhaltigkeit und Gerechtigkeit', en: 'Sustainability and Justice' },
+                    cards: {
+                        worumgehts: {
+                            title: { de: 'Worum geht\'s', en: 'What is it about' },
+                            content: { 
+                                de: 'Anhand der Kuchen-Analogie werden die klassischen Elemente nachhaltiger Entwicklung entfaltet: begrenzte Ressourcen, wachsende Zahl von Gästen und die Notwendigkeit, heute und morgen ein gutes Leben für alle zu ermöglichen. Die Brundtland-Definition wird mit einem anspruchsvollen Gerechtigkeitsbegriff verknüpft, der Verteilungs- und Ordnungsgerechtigkeit umfasst und intra- wie intergenerationale Dimensionen verbindet.',
+                                en: 'Using the cake analogy, the classic elements of sustainable development are explored: limited resources, growing number of guests, and the necessity to enable a good life for all today and tomorrow. The Brundtland definition is linked with an ambitious concept of justice that encompasses distributive and procedural justice, connecting intra- and intergenerational dimensions.'
+                            }
+                        },
+                        kerndefinitionen: {
+                            title: { de: 'Kerndefinitionen', en: 'Key Definitions' },
+                            content: { 
+                                de: '<strong>Brundtland-Definition:</strong> Nachhaltige Entwicklung ermöglicht der gegenwärtigen Generation ein gutes Leben, ohne künftigen Generationen diese Möglichkeit zu nehmen.<br><br><strong>Verteilungsgerechtigkeit:</strong> Faire Aufteilung von Ressourcen und Chancen.<br><br><strong>Ordnungsgerechtigkeit:</strong> Umfasst Freiheit, Frieden, Stabilität und Partizipation.<br><br><strong>Suffizienz:</strong> Lösungsraum jenseits des Wachstumsparadigmas - das richtige Maß finden.',
+                                en: '<strong>Brundtland Definition:</strong> Sustainable development enables the present generation to live well without depriving future generations of this possibility.<br><br><strong>Distributive Justice:</strong> Fair allocation of resources and opportunities.<br><br><strong>Procedural Justice:</strong> Encompasses freedom, peace, stability, and participation.<br><br><strong>Sufficiency:</strong> Solution space beyond the growth paradigm - finding the right measure.'
+                            }
+                        },
+                        reflexionsaufgaben: {
+                            title: { de: 'Reflexionsaufgaben', en: 'Reflection Questions' },
+                            content: {
+                                de: '<ol><li>Wo siehst du in deiner Praxis Spannungen zwischen intra- und intergenerationaler Gerechtigkeit - und wie würdest du sie mit dem „Korridor der Bedürfnisse" fassen?</li><li>Welche deiner eigenen Konsummuster wären im Sinne des vorgestellten Suffizienzbegriffs zu hoch, welche zu niedrig?</li><li>Wie würdest du die 17 SDGs mit dem im Kapitel ausgearbeiteten Gerechtigkeitsbegriff (Ordnung, Verteilung, Partizipation) ins Verhältnis setzen?</li></ol>',
+                                en: '<ol><li>Where do you see tensions in your practice between intra- and intergenerational justice - and how would you frame them with the "corridor of needs"?</li><li>Which of your own consumption patterns would be too high or too low according to the sufficiency concept presented?</li><li>How would you relate the 17 SDGs to the concept of justice (order, distribution, participation) developed in the chapter?</li></ol>'
+                            }
+                        },
+                        ubungsaufgaben: {
+                            title: { de: 'Übungsaufgaben', en: 'Practice Exercises' },
+                            content: {
+                                de: '<strong>Aufgabe 1:</strong><br>a) Warum ist ein Nachdenken über Gerechtigkeit notwendig, um zu bestimmen, worum es bei nachhaltiger Entwicklung geht?<br>b) Konstruieren Sie ein Beispiel, um zu zeigen, dass Verteilungsgerechtigkeit nicht ausreichend ist.<br>c) Erläutern Sie anhand eines Beispiels intragenerationale und intergenerationale Gerechtigkeit.<br><br><strong>Kreativaufgabe:</strong><br>Angenommen, unser Planet würde uns unbegrenzt mit Rohstoffen versorgen und hätte unbegrenzte Aufnahmekapazitäten für Schadstoffe. Besteht die Möglichkeit, dass die wirtschaftliche Entwicklung auf diesem Planeten trotzdem nicht nachhaltig ist?',
+                                en: '<strong>Task 1:</strong><br>a) Why is thinking about justice necessary to determine what sustainable development is about?<br>b) Construct an example to show that distributive justice is not sufficient.<br>c) Explain intragenerational and intergenerational justice using an example.<br><br><strong>Creative Task:</strong><br>Assuming our planet would provide us with unlimited resources and have unlimited capacity for pollutants. Is it possible that economic development on this planet would still not be sustainable?'
+                            }
+                        }
+                    }
+                },
+                {
+                    id: 'menschenbilder',
+                    title: { de: 'Menschenbilder: Homo Oeconomicus und Homo Politicus', en: 'Human Images: Homo Oeconomicus and Homo Politicus' },
+                    cards: {
+                        worumgehts: {
+                            title: { de: 'Worum geht\'s', en: 'What is it about' },
+                            content: {
+                                de: 'Das Kapitel rekonstruiert den Homo oeconomicus als analytisches Menschenbild des rational nutzmaximierenden, nicht sättigbaren und eigeninteressierten Akteurs. Dem wird der Homo politicus gegenübergestellt: ein Mensch mit intrinsischem Gerechtigkeitsinteresse, Streitbereitschaft, Mut, Urteilskraft und Verantwortungsbewusstsein.',
+                                en: 'The chapter reconstructs Homo oeconomicus as an analytical human image of the rationally utility-maximizing, non-satiable, and self-interested actor. This is contrasted with Homo politicus: a human with intrinsic interest in justice, willingness to debate, courage, judgment, and sense of responsibility.'
+                            }
+                        },
+                        kerndefinitionen: {
+                            title: { de: 'Kerndefinitionen', en: 'Key Definitions' },
+                            content: {
+                                de: '<strong>Homo Oeconomicus:</strong> Rational, nutzenmaximierend, eigeninteressiert, nicht sättigbar, berechenbares Verhalten.<br><br><strong>Homo Politicus:</strong> Gerechtigkeitsinteressiert, streitbereit, mutig, urteilsfähig, verantwortungsbewusst, unvorhersehbares Handeln.<br><br><strong>Zivilgesellschaftliches Engagement:</strong> Handeln im Rahmen des Rechtsstaats für Gemeinwohl und Nachhaltigkeit.',
+                                en: '<strong>Homo Oeconomicus:</strong> Rational, utility-maximizing, self-interested, non-satiable, predictable behavior.<br><br><strong>Homo Politicus:</strong> Justice-oriented, willing to debate, courageous, capable of judgment, responsible, unpredictable action.<br><br><strong>Civil Society Engagement:</strong> Acting within the rule of law for common good and sustainability.'
+                            }
+                        },
+                        reflexionsaufgaben: {
+                            title: { de: 'Reflexionsaufgaben', en: 'Reflection Questions' },
+                            content: {
+                                de: '<ol><li>In welchen Rollen handelst du selbst eher als Homo oeconomicus, in welchen eher als Homo politicus - und wo erlebst du Spannungen zwischen beiden?</li><li>Welche Kriterien des Kapitels würdest du an aktuelle Klima-Protestformen anlegen, um deren Anspruch auf „zivilen Widerstand" zu beurteilen?</li><li>Was bedeutet es für dich konkret, Macht im Sinne des Homo politicus rechtlich gebunden und verantwortungsvoll auszuüben?</li></ol>',
+                                en: '<ol><li>In which roles do you act more as Homo oeconomicus, in which more as Homo politicus - and where do you experience tensions between both?</li><li>Which criteria from the chapter would you apply to current climate protest forms to assess their claim to "civil disobedience"?</li><li>What does it concretely mean for you to exercise power in the sense of Homo politicus in a legally bound and responsible manner?</li></ol>'
+                            }
+                        },
+                        ubungsaufgaben: {
+                            title: { de: 'Übungsaufgaben', en: 'Practice Exercises' },
+                            content: {
+                                de: '<strong>Aufgabe 1 - Homo Oeconomicus:</strong><br>a) Welche der fünf Annahmen sehen Sie als die kritischste an und warum?<br>b) Wie würden Sie den Homo oeconomicus gegenüber Kritikern verteidigen?<br>c) Erläutern Sie am Beispiel der Abwasserregulierung, wie auf dieser Grundlage Umweltgesetzgebung entworfen werden könnte.<br><br><strong>Aufgabe 2 - Homo Politicus:</strong><br>a) Welche der fünf Annahmen sehen Sie als die kritischste an?<br>b) Wie würden Sie den Homo politicus verteidigen?',
+                                en: '<strong>Task 1 - Homo Oeconomicus:</strong><br>a) Which of the five assumptions do you see as most critical and why?<br>b) How would you defend Homo oeconomicus against critics?<br>c) Using wastewater regulation as an example, explain how environmental legislation could be designed on this basis.<br><br><strong>Task 2 - Homo Politicus:</strong><br>a) Which of the five assumptions do you see as most critical?<br>b) How would you defend Homo politicus?'
+                            }
+                        }
+                    }
+                },
+                {
+                    id: 'verantwortung',
+                    title: { de: 'Verantwortung', en: 'Responsibility' },
+                    cards: {
+                        worumgehts: {
+                            title: { de: 'Worum geht\'s', en: 'What is it about' },
+                            content: {
+                                de: 'Verantwortung wird als mehrschichtiges Konzept gefasst: kausale Verantwortung (Wer verursacht was?), moralische und rechtliche Verantwortung (Wer kann wofür zur Rechenschaft gezogen werden?) und politische Verantwortung (Wer muss handeln, wenn individuelle Verantwortung an Grenzen stößt?).',
+                                en: 'Responsibility is conceived as a multi-layered concept: causal responsibility (Who causes what?), moral and legal responsibility (Who can be held accountable for what?) and political responsibility (Who must act when individual responsibility reaches its limits?).'
+                            }
+                        },
+                        kerndefinitionen: {
+                            title: { de: 'Kerndefinitionen', en: 'Key Definitions' },
+                            content: {
+                                de: '<strong>Kausale Verantwortung:</strong> Verursachung einer Wirkung (mit oder ohne Schuld).<br><br><strong>Moralische Verantwortung:</strong> Kann zur Rechenschaft gezogen werden, auch wenn rechtlich nicht sanktionierbar.<br><br><strong>Rechtliche Verantwortung:</strong> Rechtlich sanktionierbare Verantwortung.<br><br><strong>Politische Verantwortung:</strong> Kollektives Handeln notwendig, wenn individuelle Verantwortung nicht ausreicht.',
+                                en: '<strong>Causal Responsibility:</strong> Causing an effect (with or without guilt).<br><br><strong>Moral Responsibility:</strong> Can be held accountable, even if not legally sanctionable.<br><br><strong>Legal Responsibility:</strong> Legally sanctionable responsibility.<br><br><strong>Political Responsibility:</strong> Collective action necessary when individual responsibility is insufficient.'
+                            }
+                        },
+                        reflexionsaufgaben: {
+                            title: { de: 'Reflexionsaufgaben', en: 'Reflection Questions' },
+                            content: {
+                                de: '<ol><li>Wo würdest du im „Emscher-Beispiel" deine eigene Rolle verorten, wenn du in Politik, Verwaltung, Wirtschaft oder Zivilgesellschaft tätig wärst?</li><li>Welche Umweltprobleme, mit denen du arbeitest, verlangen eher nach Zurechnung moralischer/rechtlicher Verantwortung, welche eher nach politischer?</li><li>Wo erlebst du Unwissen als reale Grenze deiner Verantwortung - und wie gehst du damit um?</li></ol>',
+                                en: '<ol><li>Where would you locate your own role in the "Emscher example" if you were active in politics, administration, business, or civil society?</li><li>Which environmental problems you work with require more moral/legal responsibility attribution, which more political?</li><li>Where do you experience ignorance as a real limit to your responsibility - and how do you deal with it?</li></ol>'
+                            }
+                        },
+                        ubungsaufgaben: {
+                            title: { de: 'Übungsaufgaben', en: 'Practice Exercises' },
+                            content: {
+                                de: 'Welche der folgenden Aussagen sind der Verantwortung als Zuschreibung (kausal) zuzuordnen?<br><br>- Martin hat viel gelernt und eine sehr gute Klausur geschrieben<br>- Sandra hat getrödelt und den Bus verpasst<br>- Um Geld zu sparen, entsorgen Schiffe Altöle ins offene Meer<br>- Ein Unfallfahrer zieht einen Unbeteiligten in Mitleidenschaft<br><br><strong>Kreativaufgabe:</strong><br>Konstruieren Sie einen Fall, in dem gilt: „Ich bin kausal verantwortlich, doch ich kann nichts dafür."',
+                                en: 'Which of the following statements represent responsibility as attribution (causal)?<br><br>- Martin studied hard and wrote an excellent exam<br>- Sandra dawdled and missed the bus<br>- To save money, ships dispose of waste oil in the open sea<br>- An accident driver affects an uninvolved person<br><br><strong>Creative Task:</strong><br>Construct a case where: "I am causally responsible, but I cannot be blamed."'
+                            }
+                        }
+                    }
+                },
+                {
+                    id: 'urteilskraft',
+                    title: { de: 'Urteilskraft', en: 'Judgment' },
+                    cards: {
+                        worumgehts: {
+                            title: { de: 'Worum geht\'s', en: 'What is it about' },
+                            content: {
+                                de: 'Urteilskraft wird als das vermittelnde Können beschrieben, das theoretisches „Know-that" in praktisches „Know-how" übersetzt. An Beispielen wird gezeigt, wie Urteilskraft mit Unwissen, Komplexität, Zeitstrukturen und politischer Auseinandersetzung umgehen muss.',
+                                en: 'Judgment is described as the mediating capability that translates theoretical "know-that" into practical "know-how." Examples show how judgment must deal with ignorance, complexity, time structures, and political conflict.'
+                            }
+                        },
+                        kerndefinitionen: {
+                            title: { de: 'Kerndefinitionen', en: 'Key Definitions' },
+                            content: {
+                                de: '<strong>Know-that:</strong> Theoretisches Wissen, Faktenwissen.<br><br><strong>Know-how:</strong> Praktisches Können, Anwendung in konkreten Situationen.<br><br><strong>Urteilskraft:</strong> Vermögen, Know-that in Know-how zu übersetzen. Umfasst Sinn für den richtigen Zeitpunkt (Kairos), Lernbereitschaft, Selbstkritik, Mut zu nicht-perfekten Lösungen.',
+                                en: '<strong>Know-that:</strong> Theoretical knowledge, factual knowledge.<br><br><strong>Know-how:</strong> Practical ability, application in concrete situations.<br><br><strong>Judgment:</strong> Capacity to translate know-that into know-how. Includes sense for the right moment (Kairos), willingness to learn, self-criticism, courage for imperfect solutions.'
+                            }
+                        },
+                        reflexionsaufgaben: {
+                            title: { de: 'Reflexionsaufgaben', en: 'Reflection Questions' },
+                            content: {
+                                de: '<ol><li>Wo in deinem Arbeitsfeld erlebst du ein Übergewicht an „Know-that" gegenüber fehlendem „Know-how" - und woran machst du das fest?</li><li>Erinnere dich an eine eigene Entscheidung unter Unsicherheit: Welche Elemente der „Regeln der Urteilskraft" haben dir gefehlt, welche waren vorhanden?</li><li>Wie würdest du ein Format nach dem Vorbild des Bürgerrats Klima in deinem Kontext gestalten?</li></ol>',
+                                en: '<ol><li>Where in your field do you experience an overweight of "know-that" versus missing "know-how" - and how do you identify this?</li><li>Remember a decision you made under uncertainty: Which elements of the "rules of judgment" were missing, which were present?</li><li>How would you design a format modeled after the Citizens\' Climate Assembly in your context?</li></ol>'
+                            }
+                        },
+                        ubungsaufgaben: {
+                            title: { de: 'Übungsaufgaben', en: 'Practice Exercises' },
+                            content: {
+                                de: '<em>Übungsaufgaben werden noch ergänzt. Dieser Bereich ist editierbar und kann jederzeit mit konkreten Aufgaben gefüllt werden.</em>',
+                                en: '<em>Practice exercises will be added later. This area is editable and can be filled with specific tasks at any time.</em>'
+                            }
+                        }
+                    }
+                }
+            ]
+        };
+
+        let currentLanguage = 'de';
+        let currentCluster = 'nature';
+        let currentConcept = null;
+        let currentCardType = 'worumgehts';
+
+        // Initialize app
+        function init() {
+            selectCluster('nature');
+        }
+
+        // Switch language
+        function switchLanguage(lang) {
+            currentLanguage = lang;
+            
+            // Update language buttons
+            document.querySelectorAll('.language-switch button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update all translatable elements
+            document.querySelectorAll('[data-de]').forEach(el => {
+                el.textContent = el.getAttribute('data-' + lang);
+            });
+
+            // Reload current view
+            if (currentConcept) {
+                showLearningCards(currentConcept);
+            } else {
+                selectCluster(currentCluster);
+            }
+        }
+
+        // Select cluster
+        function selectCluster(cluster) {
+            currentCluster = cluster;
+            
+            // Update cluster tabs
+            document.querySelectorAll('.cluster-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`.cluster-tab.${cluster}`).classList.add('active');
+
+            // Load concepts for this cluster
+            loadConcepts(cluster);
+        }
+
+        // Load concepts
+        function loadConcepts(cluster) {
+            const container = document.getElementById('conceptsContainer');
+            const clusterConcepts = concepts[cluster] || [];
+            
+            container.innerHTML = clusterConcepts.map(concept => `
+                <div class="concept-card ${cluster}" onclick="showLearningCards('${concept.id}')">
+                    <h3>${concept.title[currentLanguage]}</h3>
+                    <p>${currentLanguage === 'de' ? 'Klicken für Lernkarten' : 'Click for learning cards'}</p>
+                </div>
+            `).join('');
+        }
+
+        // Show learning cards for a concept
+        function showLearningCards(conceptId) {
+            // Find the concept
+            let concept = null;
+            let clusterType = null;
+            
+            for (const [cluster, clusterConcepts] of Object.entries(concepts)) {
+                const found = clusterConcepts.find(c => c.id === conceptId);
+                if (found) {
+                    concept = found;
+                    clusterType = cluster;
+                    break;
+                }
+            }
+
+            if (!concept) return;
+
+            currentConcept = conceptId;
+            currentCardType = 'worumgehts';
+
+            // Hide main view, show learning cards view
+            document.getElementById('mainView').style.display = 'none';
+            document.getElementById('learningCardsView').classList.add('active');
+
+            // Update concept title
+            document.getElementById('conceptTitle').textContent = concept.title[currentLanguage];
+
+            // Create card type tabs
+            const cardTypes = ['worumgehts', 'kerndefinitionen', 'reflexionsaufgaben', 'ubungsaufgaben'];
+            const tabsContainer = document.getElementById('cardTypeTabs');
+            
+            tabsContainer.innerHTML = cardTypes.map(type => {
+                const card = concept.cards[type];
+                return `
+                    <button class="card-type-tab ${clusterType} ${type === 'worumgehts' ? 'active' : ''}" 
+                            data-type="${type}"
+                            onclick="showCardType('${type}', '${clusterType}')">
+                        ${card.title[currentLanguage]}
+                    </button>
+                `;
+            }).join('');
+
+            // Show first card
+            showCardType('worumgehts', clusterType);
+        }
+
+        // Show specific card type
+        function showCardType(type, clusterType) {
+            currentCardType = type;
+
+            // Update tab buttons
+            document.querySelectorAll('.card-type-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const activeButton = Array.from(document.querySelectorAll('.card-type-tab')).find(btn => 
+                btn.textContent.trim() === document.querySelector(`[data-type="${type}"]`)?.textContent.trim()
+            );
+            if (activeButton) activeButton.classList.add('active');
+
+            // Find the concept
+            let concept = null;
+            for (const clusterConcepts of Object.values(concepts)) {
+                const found = clusterConcepts.find(c => c.id === currentConcept);
+                if (found) {
+                    concept = found;
+                    break;
+                }
+            }
+
+            if (!concept) return;
+
+            const card = concept.cards[type];
+            const contentContainer = document.getElementById('cardContentContainer');
+
+            if (card && card.content[currentLanguage]) {
+                contentContainer.innerHTML = `
+                    <div class="card-content active">
+                        <div class="card-section">
+                            <h3>${card.title[currentLanguage]}</h3>
+                            <div id="cardContentDisplay">${card.content[currentLanguage]}</div>
+                            <button class="edit-button" onclick="enterEditMode()">
+                                ✏️ <span>${currentLanguage === 'de' ? 'Inhalt bearbeiten' : 'Edit content'}</span>
+                            </button>
+                            <div id="editModeContainer"></div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                contentContainer.innerHTML = `
+                    <div class="card-content active">
+                        <div class="empty-state">
+                            <p>${currentLanguage === 'de' ? 
+                                'Dieser Bereich ist noch leer und kann später ergänzt werden.' : 
+                                'This area is still empty and can be filled in later.'}</p>
+                            <p style="margin-top: 10px; font-size: 0.9rem;">✏️ ${currentLanguage === 'de' ? 'Editierbar' : 'Editable'}</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Back to main view
+        function backToMain() {
+            currentConcept = null;
+            document.getElementById('mainView').style.display = 'block';
+            document.getElementById('learningCardsView').classList.remove('active');
+            selectCluster(currentCluster);
+        }
+
+        // Edit mode functions
+        function enterEditMode() {
+            const concept = findConcept(currentConcept);
+            if (!concept) return;
+
+            const card = concept.cards[currentCardType];
+            const currentContent = card.content[currentLanguage];
+            
+            const editContainer = document.getElementById('editModeContainer');
+            editContainer.innerHTML = `
+                <div class="edit-mode">
+                    <h4>${currentLanguage === 'de' ? '✏️ Bearbeitungsmodus' : '✏️ Edit Mode'}</h4>
+                    <p class="edit-hint">
+                        ${currentLanguage === 'de' ? 
+                            'Hier können Sie den Inhalt dieser Lernkarte bearbeiten. HTML-Tags wie <strong>, <br>, <ol>, <li> werden unterstützt.' : 
+                            'Here you can edit the content of this learning card. HTML tags like <strong>, <br>, <ol>, <li> are supported.'}
+                    </p>
+                    <textarea id="editTextarea">${currentContent}</textarea>
+                    <div class="button-group">
+                        <button class="save-button" onclick="saveEdit()">
+                            ✓ ${currentLanguage === 'de' ? 'Speichern' : 'Save'}
+                        </button>
+                        <button class="cancel-button" onclick="cancelEdit()">
+                            ✗ ${currentLanguage === 'de' ? 'Abbrechen' : 'Cancel'}
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // Hide edit button and scroll to edit mode
+            document.querySelector('.edit-button').style.display = 'none';
+            editContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function saveEdit() {
+            const concept = findConcept(currentConcept);
+            if (!concept) return;
+
+            const newContent = document.getElementById('editTextarea').value;
+            
+            // Update the data structure
+            concept.cards[currentCardType].content[currentLanguage] = newContent;
+            
+            // Update display
+            document.getElementById('cardContentDisplay').innerHTML = newContent;
+            
+            // Clear edit mode
+            document.getElementById('editModeContainer').innerHTML = '';
+            document.querySelector('.edit-button').style.display = 'inline-flex';
+            
+            // Show success message
+            showNotification(currentLanguage === 'de' ? 
+                'Änderungen gespeichert!' : 
+                'Changes saved!', 
+                'success'
+            );
+        }
+
+        function cancelEdit() {
+            document.getElementById('editModeContainer').innerHTML = '';
+            document.querySelector('.edit-button').style.display = 'inline-flex';
+        }
+
+        function findConcept(conceptId) {
+            for (const clusterConcepts of Object.values(concepts)) {
+                const found = clusterConcepts.find(c => c.id === conceptId);
+                if (found) return found;
+            }
+            return null;
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#4CAF50' : '#f44336'};
+                color: white;
+                padding: 15px 25px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>
+
